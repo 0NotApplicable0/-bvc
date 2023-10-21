@@ -1,15 +1,15 @@
-import {useEffect, useRef, useState} from "react";
-import {Color3, Color4, GizmoManager, Mesh, PointerEventTypes} from "@babylonjs/core";
+import {Color4, HavokPlugin, Mesh, Vector3} from "@babylonjs/core";
 import {cameraSetup} from "./utils/camera_controls.js";
-import {createBox, createPlatform} from "./utils/test_utilities.js";
-import {inputSetup} from "./utils/input_manager.js";
+import {createPlatform, debugUtilitiesTick, initDebugUtilities} from "./utils/debug.js";
 import "./styles.css";
 import {Debug} from "@babylonjs/core/Legacy/legacy.js";
-import {SceneManager} from "./components/SceneManager.jsx";
-import {initBuyMenu} from "./components/buy_menu.js";
-import {AdvancedDynamicTexture, TextBlock} from "@babylonjs/gui";
-import {initCatSpawner} from "./components/cat_spawner.js";
-import {boardRender} from "./components/board_manager.js";
+import {SceneManager} from "./containers/SceneManager.jsx";
+import {bagelLogicTick} from "./components/bagel_logic.js";
+import {catLogicTick} from "./components/cat_logic.js";
+import {stateLogicTick} from "./components/state_logic.js";
+import HavokPhysics from "@babylonjs/havok";
+import {initBuyMenu} from "./containers/buy_menu.js";
+import {catSpawnerTick, initCatSpawner} from "./containers/cat_spawner.js";
 
 //region PROTOTYPES
 Mesh.prototype.showLocalAxis = function () {
@@ -25,18 +25,18 @@ Mesh.prototype.hideLocalAxis = function () {
 //endregion
 
 //region STATE
+export let bagels = [];
+export let cats = [];
 export let board = [];
 export let ground = null;
 //endregion
 
 export default function BagelsVersusCats() {
-    let debug_char = null;
-    let gui = null;
-
     /**
      * Will run when the scene is ready
      */
     const onSceneReady = (scene) => {
+        scene.clearColor = new Color4(1, 1, 1, 1);
         const canvas = scene.getEngine().getRenderingCanvas();
         const camera = cameraSetup(scene, canvas);
 
@@ -46,80 +46,18 @@ export default function BagelsVersusCats() {
         // COMPONENT SETUP //
         initBuyMenu(scene, camera, canvas);
         // initCatSpawner(scene);
-
-        // SCENE SETUP //
-        scene.clearColor = new Color4(1, 1, 1, 1);
-
-        // DEBUG //
-        const gizmoManager = new GizmoManager(scene);
-        debug_char = createBox(scene, 0, 0, 2, new Color3(0, 1, 0));
-        // debug_char.showLocalAxis();
-        // cats.push(crewateBox(scene, -2, 2, 2, new Color3(1, 0, 0)));
-        // cats.push(createBox(scene, -1, 2, 2, new Color3(1, 0, 0)));
-
-        scene.onPointerObservable.add((pointerInfo) => {
-            switch (pointerInfo.type) {
-                case PointerEventTypes.POINTERDOWN:
-                    console.log("Pointer Down: ", pointerInfo.pickInfo.pickedMesh);
-                    console.log("Board: ", board);
-                    if(pointerInfo.pickInfo.hit && board.find((mesh) => mesh.id === pointerInfo.pickInfo.pickedMesh.id)) {
-                        console.log("Damage To: ", pointerInfo.pickInfo.pickedMesh.name);
-                        board.find((mesh) => mesh.id === pointerInfo.pickInfo.pickedMesh.id).type.health -= 10;
-                    }
-                    break;
-            }
-        });
-
-        // GUI SETUP //
-        gui = AdvancedDynamicTexture.CreateFullscreenUI("myUI");
-        let debugCharPos = new TextBlock();
-        debugCharPos.name = "DebugCharPos";
-        debugCharPos.text = "Character Position: " + debug_char.position.x + ", " + debug_char.position.y + ", " + debug_char.position.z;
-        debugCharPos.color = "#1A202C";
-        debugCharPos.fontFamily = "JetBrains Mono";
-        debugCharPos.top = "-350px";
-        debugCharPos.fontSize = 24;
-        gui.addControl(debugCharPos);
-
-        // INPUT SETUP //
-        inputSetup(scene, {
-            onMinusKeyDown: () => {
-                if (gizmoManager.positionGizmoEnabled) {
-                    gizmoManager.positionGizmoEnabled = false;
-                    gizmoManager.rotationGizmoEnabled = false;
-                    gizmoManager.boundingBoxGizmoEnabled = false;
-                } else {
-                    gizmoManager.positionGizmoEnabled = true;
-                    gizmoManager.rotationGizmoEnabled = true;
-                    gizmoManager.boundingBoxGizmoEnabled = true;
-                }
-            },
-            onAKeyDown: () => {
-                // if (debug_char.position.x + 1 > 2 || debug_char.position.x + 1 < -2) return;
-                debug_char.position.x += 1;
-            },
-            onDKeyDown: () => {
-                // if (debug_char.position.x - 1 > 2 || debug_char.position.x - 1 < -2) return;
-                debug_char.position.x -= 1;
-            },
-            onWKeyDown: () => {
-                // if (debug_char.position.z - 1 > 2 || debug_char.position.z - 1 < -2) return;
-                debug_char.position.z -= 1;
-            },
-            onSKeyDown: () => {
-                // if (debug_char.position.z + 1 > 2 || debug_char.position.z + 1 < -2) return;
-                debug_char.position.z += 1;
-            }
-        });
+        initDebugUtilities(scene);
     }
 
     /**
      * Will run on every frame render.
      */
     const onRender = (scene) => {
-        gui.getControlByName("DebugCharPos").text = "Character Position: " + debug_char.position.x + ", " + debug_char.position.y + ", " + debug_char.position.z;
-        // console.log("Board: ", board);
-        boardRender(scene, board);
+        stateLogicTick(scene);
+        debugUtilitiesTick(scene);
+        bagelLogicTick(scene);
+        catLogicTick(scene);
+        catSpawnerTick(scene);
     }
 
     return (

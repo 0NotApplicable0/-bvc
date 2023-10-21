@@ -12,7 +12,7 @@ export const cameraSetup = (scene, canvas) => {
     camera.mode = Camera.ORTHOGRAPHIC_CAMERA;
 
     // This attaches the camera to the canvas
-    // camera.attachControl(canvas, true);
+    camera.attachControl(canvas, true);
 
     camera.lowerRadiusLimit = camera.radius;
     camera.upperRadiusLimit = camera.radius;
