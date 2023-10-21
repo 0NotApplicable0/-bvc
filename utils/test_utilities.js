@@ -10,8 +10,9 @@ export const createBox = (scene, x, y, z, color) => {
     let material = new GridMaterial("myMaterial", scene);
     material.lineColor = new Color3(0.2, 0.2, 0.2);
     material.minorUnitVisibility = 0;
-    material.gridOffset = new Vector3(0, 0, 0);
+    material.gridOffset = new Vector3(0.5, 0.5, 0.5);
     material.majorUnitFrequency = 0.5;
+    material.diffuseColor = new Color3(0.667, 0.4, 0.168);
 
     material.mainColor = color;
     box.material = material;

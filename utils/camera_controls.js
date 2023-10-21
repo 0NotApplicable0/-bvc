@@ -44,8 +44,8 @@ export const zoom2DView = (camera, delta, canvas) => {
             return;
         }
 
-        camera.orthoLeft += delta / 8;
-        camera.orthoRight -= delta / 8;
+        camera.orthoLeft += delta / 2;
+        camera.orthoRight -= delta / 2;
 
         setTopBottomRatio(camera, canvas);
     }

@@ -1,9 +1,9 @@
-import {Color3, MeshBuilder, Vector3} from "@babylonjs/core";
+import {Color3, Color4, MeshBuilder, Vector3} from "@babylonjs/core";
 import {GridMaterial} from "@babylonjs/materials";
 
 export const createPlatform = (scene) => {
-    for (let x = -3; x < 3; x++) {
-        for (let y = -3; y < 3; y++) {
+    for (let x = -2; x < 3; x++) {
+        for (let y = -2; y < 3; y++) {
             for (let z = 0; z < 2; z++) {
                 let box = MeshBuilder.CreateBox("box", {size: 1}, scene);
                 box.position.x = x;
@@ -11,7 +11,7 @@ export const createPlatform = (scene) => {
                 box.position.y = z;
 
                 // box.enableEdgesRendering();
-                // box.edgesColor = new BABYLON.Color4(0, 0, 0, 1);
+                // box.edgesColor = new Color4(0, 0, 0, 1);
                 // box.edgesWidth = 3;
 
                 let material = new GridMaterial("myMaterial", scene);
@@ -22,14 +22,13 @@ export const createPlatform = (scene) => {
 
                 if (z == 1) {
                     material.mainColor = new Color3(0.49, 0.8, 0.05);
-                    // material.diffuseColor = new BABYLON.Color3(0.49, 0.8, 0.05);
+                    material.diffuseColor = new Color3(0.49, 0.8, 0.05);
                 } else {
-                    // rgba(170,102,43,255)
                     material.mainColor = new Color3(0.667, 0.4, 0.168);
-                    // material.diffuseColor = new BABYLON.Color3(0.667, 0.4, 0.168);
+                    material.diffuseColor = new Color3(0.667, 0.4, 0.168);
                 }
-                // material.ambientColor = new BABYLON.Color3(0.0, 0.0, 0.0);
-                // material.specularColor = new BABYLON.Color3(0,0,0);
+                // material.ambientColor = new Color3(0.0, 0.0, 0.0);
+                // material.specularColor = new Color3(0,0,0);
 
                 box.material = material;
             }
