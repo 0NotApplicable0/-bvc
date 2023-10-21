@@ -43,7 +43,7 @@ export const createPlatform = (scene) => {
                 if (z == 1) {
                     material.mainColor = new Color3(0.49, 0.8, 0.05);
                     material.diffuseColor = new Color3(0.49, 0.8, 0.05);
-                    ground.push(box);
+                    if (y !== 2) ground.push(box);
                 } else {
                     material.mainColor = new Color3(0.667, 0.4, 0.168);
                     material.diffuseColor = new Color3(0.667, 0.4, 0.168);

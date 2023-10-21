@@ -1,7 +1,26 @@
 import {createBox} from "../utils/test_utilities.js";
-import {Color3, HighlightLayer, PointerEventTypes, Vector3} from "@babylonjs/core";
+import {Color3, DynamicTexture, HighlightLayer, Mesh, PointerEventTypes, StandardMaterial, Vector3} from "@babylonjs/core";
 import {board, ground} from "../BagelsVersusCats.jsx";
 import {GridMaterial} from "@babylonjs/materials";
+import {AdvancedDynamicTexture, Rectangle} from "@babylonjs/gui";
+
+const availableBagels = [{
+    name: "standard",
+    color: new Color3(0.337, 0.8, 0.468),
+    health: 200,
+}, {
+    name: "sesame",
+    color: new Color3(0.87, 0.5, 0.128),
+    health: 100,
+}, {
+    name: "everything",
+    color: new Color3(0.647, 0.4, 0.128),
+    health: 100,
+}, {
+    name: "poppy",
+    color: new Color3(0.17, 0.4, 0.168),
+    health: 100,
+}]
 
 export const initBuyMenu = (scene, camera, canvas) => {
     let bagels = null;
@@ -48,10 +67,32 @@ export const initBuyMenu = (scene, camera, canvas) => {
             let newBagelPlacement = ground.find((platform) => platform === pointerInfo.pickInfo.pickedMesh).position;
             console.log(newBagelPlacement);
 
+            // Render Bagel
             let newBagel = createBox(scene,
                 newBagelPlacement.x, newBagelPlacement.z, newBagelPlacement.y + 1,
-                new Color3(Math.random(), Math.random(), Math.random()), selectedMesh.name);
-            board.push(newBagel);
+                selectedMesh.material.mainColor, selectedMesh.name);
+            newBagel.type = {...selectedMesh.type};
+            newBagel.id = crypto.randomUUID();
+
+            // Render Health Bar
+            var plane = Mesh.CreatePlane("healthbar", 2);
+            plane.parent = newBagel;
+            plane.position.y = 1;
+
+            const healthBar = AdvancedDynamicTexture.CreateForMesh(plane, 200, 100);
+
+            var rect1 = new Rectangle();
+            rect1.width = (newBagel.type.health / 100 / 2);
+            rect1.height = "10px";
+            rect1.color = "black";
+            rect1.background = "red";
+            rect1.thickness = 1;
+            healthBar.addControl(rect1);
+
+
+            board.push({
+                ...newBagel, healthBar: rect1
+            });
 
             selectedMesh.renderOutline = false;
             selectedMesh = null;
@@ -66,12 +107,13 @@ export const initBuyMenu = (scene, camera, canvas) => {
     }
 
     const createMeshes = () => {
-        const createInScene = (x, y, z, name) => {
-            return createBox(scene, x, y, z, new Color3(Math.random(), Math.random(), Math.random()), name);
+        const createInScene = (x, y, z, bagel) => {
+            let createdBagel = createBox(scene, x, y, z, bagel.color, bagel.name);
+            createdBagel.type = bagel;
+            return createdBagel;
         }
 
         const generatedMeshes = [];
-        const availableBagels = ["standard", "sesame", "everything", "poppy"];
         availableBagels.forEach((bagel, index) => {
             generatedMeshes.push(createInScene(3 + (index * 2), -7 + (index * 2), 2, bagel));
         });
