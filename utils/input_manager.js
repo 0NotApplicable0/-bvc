@@ -1,19 +1,15 @@
-import {KeyboardEventTypes, PointerEventTypes} from "@babylonjs/core";
+import {KeyboardEventTypes} from "@babylonjs/core";
 import {Inspector} from "@babylonjs/inspector";
 
-export const inputSetup = (scene, keyManagers) => {
+export const inputSetup = (scene, keyManagers, ground) => {
     scene.onKeyboardObservable.add((kbInfo) => {
-
-        console.log("Key event: ", kbInfo.event.key)
-
         switch (kbInfo.type) {
             case KeyboardEventTypes.KEYDOWN:
                 switch (kbInfo.event.key) {
                     case "`":
                         if (scene.debugLayer.isVisible()) {
                             Inspector.Hide();
-                        }
-                        else {
+                        } else {
                             Inspector.Show(scene, {});
                         }
                         break;

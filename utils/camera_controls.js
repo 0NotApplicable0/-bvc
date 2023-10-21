@@ -1,4 +1,4 @@
-import {ArcRotateCamera, Camera, Vector3} from "@babylonjs/core";
+import {ArcRotateCamera, Camera, PointerEventTypes, Vector3} from "@babylonjs/core";
 
 export const cameraSetup = (scene, canvas) => {
     let camera = new ArcRotateCamera(
@@ -22,6 +22,11 @@ export const cameraSetup = (scene, canvas) => {
     camera.orthoLeft = (-1.2 * width) / 2;
     camera.orthoRight = -camera.orthoLeft;
 
+    scene.onPointerObservable.add(({event}) => {
+        const delta = -Math.sign(event.deltaY);
+        zoom2DView(camera, delta, canvas);
+    }, PointerEventTypes.POINTERWHEEL);
+
     setTopBottomRatio(camera, canvas);
     return camera;
 }
@@ -40,7 +45,6 @@ export const zoom2DView = (camera, delta, canvas) => {
     if (camera.orthoLeft && camera.orthoRight) {
         // limit zooming in to no less than 3 units.
         if (!zoomingOut && Math.abs(camera.orthoLeft) <= 3) {
-            console.log("Skip");
             return;
         }
 

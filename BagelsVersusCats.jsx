@@ -1,21 +1,14 @@
-import {useEffect, useRef} from "react";
-import {
-    Color3,
-    Color4,
-    DefaultRenderingPipeline,
-    Engine,
-    GizmoManager,
-    Mesh,
-    PointerEventTypes,
-    Scene,
-    TransformNode
-} from "@babylonjs/core";
-import {cameraSetup, zoom2DView} from "./utils/camera_controls.js";
-import {createPlatform} from "./utils/generate_scene.js";
-import {createBox} from "./utils/test_utilities.js";
+import {useEffect, useRef, useState} from "react";
+import {Color3, Color4, GizmoManager, Mesh} from "@babylonjs/core";
+import {cameraSetup} from "./utils/camera_controls.js";
+import {createBox, createPlatform} from "./utils/test_utilities.js";
 import {inputSetup} from "./utils/input_manager.js";
 import "./styles.css";
 import {Debug} from "@babylonjs/core/Legacy/legacy.js";
+import {SceneManager} from "./components/SceneManager.jsx";
+import {initBuyMenu} from "./components/buy_menu.js";
+import {AdvancedDynamicTexture, TextBlock} from "@babylonjs/gui";
+import {initCatSpawner} from "./components/cat_spawner.js";
 
 //region PROTOTYPES
 Mesh.prototype.showLocalAxis = function () {
@@ -30,51 +23,14 @@ Mesh.prototype.hideLocalAxis = function () {
 };
 //endregion
 
-const Game = ({antialias, engineOptions, adaptToDeviceRatio, sceneOptions, onRender, onSceneReady, ...rest}) => {
-    const reactCanvas = useRef(null);
-
-    useEffect(() => {
-        const {current: canvas} = reactCanvas;
-        if (!canvas) return;
-
-        // Load the engine & scene...
-        const engine = new Engine(canvas, antialias, engineOptions, adaptToDeviceRatio);
-        const scene = new Scene(engine, sceneOptions);
-        if (scene.isReady()) {
-            onSceneReady(scene);
-        } else {
-            scene.onReadyObservable.addOnce((scene) => onSceneReady(scene));
-        }
-
-        engine.runRenderLoop(() => {
-            if (typeof onRender === "function") onRender(scene);
-            scene.render();
-        });
-
-        const resize = () => {
-            scene.getEngine().resize();
-        };
-
-        if (window) {
-            window.addEventListener("resize", resize);
-        }
-
-        // Unmount Cleanup...
-        return () => {
-            scene.getEngine().dispose();
-
-            if (window) {
-                window.removeEventListener("resize", resize);
-            }
-        };
-    }, [antialias, engineOptions, adaptToDeviceRatio, sceneOptions, onRender, onSceneReady]);
-
-    return <canvas ref={reactCanvas} {...rest} />;
-};
+//region STATE
+export let board = [];
+export let ground = null;
+//endregion
 
 export default function BagelsVersusCats() {
-    let character = null;
-    let cat = null;
+    let debug_char = null;
+    let gui = null;
 
     /**
      * Will run when the scene is ready
@@ -82,42 +38,34 @@ export default function BagelsVersusCats() {
     const onSceneReady = (scene) => {
         const canvas = scene.getEngine().getRenderingCanvas();
         const camera = cameraSetup(scene, canvas);
-        const anchor = new TransformNode("");
 
-        // OTHER //
-        character = createBox(scene, 0, 0, 2, new Color3(0, 1, 0));
-        cat = createBox(scene, -2, 2, 2, new Color3(1, 0, 0));
+        // SCENE GENERATION //
+        ground = createPlatform(scene);
+
+        // COMPONENT SETUP //
+        initBuyMenu(scene, camera, canvas);
+        initCatSpawner(scene);
 
         // SCENE SETUP //
         scene.clearColor = new Color4(1, 1, 1, 1);
-        scene.onPointerObservable.add(({event}) => {
-            const delta = -Math.sign(event.deltaY);
-            zoom2DView(camera, delta, canvas);
-        }, PointerEventTypes.POINTERWHEEL);
-
-        // GIZMO SETUP //
-        const gizmoManager = new GizmoManager(scene);
 
         // DEBUG SETTINGS //
-        // const characterAxesView = new Debug.AxesViewer(scene, 1)
-        // characterAxesView.xAxis.parent = character;
-        // characterAxesView.yAxis.parent = character;
-        // characterAxesView.zAxis.parent = character;
-        // createAxisViewerForMesh(character);
-        character.showLocalAxis();
-        // cat.showLocalAxis();
-        // character.hideLocalAxis();
+        const gizmoManager = new GizmoManager(scene);
+        debug_char = createBox(scene, 0, 0, 2, new Color3(0, 1, 0));
+        // debug_char.showLocalAxis();
+        // cats.push(crewateBox(scene, -2, 2, 2, new Color3(1, 0, 0)));
+        // cats.push(createBox(scene, -1, 2, 2, new Color3(1, 0, 0)));
 
-        // PIPELINE //
-        let pipeline = new DefaultRenderingPipeline(
-            "pipeline",
-            false,
-            scene,
-            scene.cameras
-        );
-        pipeline.imageProcessingEnabled = true;
-        pipeline.imageProcessing.vignetteEnabled = true;
-        pipeline.imageProcessing.vignetteWeight = 2;
+        // GUI SETUP //
+        gui = AdvancedDynamicTexture.CreateFullscreenUI("myUI");
+        let debugCharPos = new TextBlock();
+        debugCharPos.name = "DebugCharPos";
+        debugCharPos.text = "Character Position: " + debug_char.position.x + ", " + debug_char.position.y + ", " + debug_char.position.z;
+        debugCharPos.color = "#1A202C";
+        debugCharPos.fontFamily = "JetBrains Mono";
+        debugCharPos.top = "-350px";
+        debugCharPos.fontSize = 24;
+        gui.addControl(debugCharPos);
 
         // INPUT SETUP //
         inputSetup(scene, {
@@ -133,75 +81,35 @@ export default function BagelsVersusCats() {
                 }
             },
             onAKeyDown: () => {
-                if (character.position.x + 1 > 2 || character.position.x + 1 < -2) return;
-                character.position.x += 1;
+                // if (debug_char.position.x + 1 > 2 || debug_char.position.x + 1 < -2) return;
+                debug_char.position.x += 1;
             },
             onDKeyDown: () => {
-                if (character.position.x - 1 > 2 || character.position.x - 1 < -2) return;
-                character.position.x -= 1;
+                // if (debug_char.position.x - 1 > 2 || debug_char.position.x - 1 < -2) return;
+                debug_char.position.x -= 1;
             },
             onWKeyDown: () => {
-                if (character.position.z - 1 > 2 || character.position.z - 1 < -2) return;
-                character.position.z -= 1;
+                // if (debug_char.position.z - 1 > 2 || debug_char.position.z - 1 < -2) return;
+                debug_char.position.z -= 1;
             },
             onSKeyDown: () => {
-                if (character.position.z + 1 > 2 || character.position.z + 1 < -2) return;
-                character.position.z += 1;
+                // if (debug_char.position.z + 1 > 2 || debug_char.position.z + 1 < -2) return;
+                debug_char.position.z += 1;
             }
         });
-
-        // SCENE GENERATION //
-        createPlatform(scene);
-        // createBuyMenu(scene);
-
     }
 
     /**
      * Will run on every frame render.
      */
     const onRender = (scene) => {
-        console.log("Character X Y Z", character.position.x, character.position.y, character.position.z)
+        gui.getControlByName("DebugCharPos").text = "Character Position: " + debug_char.position.x + ", " + debug_char.position.y + ", " + debug_char.position.z;
     }
-
-    useEffect(() => {
-        console.log("BagelsVersusCats mounted");
-
-        let catMover = setInterval(() => {
-            let previousX = cat.position.x;
-            let previousZ = cat.position.z;
-            let newX = previousX;
-            let newZ = previousZ;
-
-            if (Math.random() < 0.5) {
-                if (previousX + 1 > 2 || previousX + 1 < -2) newX -= 1;
-                else newX += 1;
-            } else {
-                if (previousX - 1 > 2 || previousX - 1 < -2) newX += 1;
-                else newX -= 1;
-            }
-
-            if (Math.random() < 0.5) {
-                if (previousZ + 1 > 2 || previousZ + 1 < -2) newZ -= 1;
-                else newZ += 1;
-            } else {
-                if (previousZ - 1 > 2 || previousZ - 1 < -2) newZ += 1;
-                else newZ -= 1;
-            }
-
-            cat.position.x = newX;
-            cat.position.z = newZ;
-        }, 1000);
-
-        return () => {
-            clearInterval(catMover);
-            console.log("BagelsVersusCats unmounted");
-        }
-    }, []);
 
     return (
         <div id={"game-container"}>
-            <Game antialias onSceneReady={onSceneReady} onRender={onRender} id="bvc"
-                  style={{width: "80%", height: "80%", borderRadius: "12px"}}/>
+            <SceneManager antialias onSceneReady={onSceneReady} onRender={onRender} id="bvc"
+                          style={{width: "80%", height: "80%", borderRadius: "12px"}}/>
         </div>
     )
 }
