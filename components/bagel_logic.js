@@ -7,8 +7,8 @@ import clone from "just-clone";
 export const availableBagels = [{
     name: "standard",
     color: new Color3(0.337, 0.8, 0.468),
-    health: 500,
-    damage: 25,
+    health: 50000,
+    damage: 35,
 }, {
     name: "sesame",
     color: new Color3(0.87, 0.5, 0.128),

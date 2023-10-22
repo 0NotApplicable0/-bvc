@@ -7,7 +7,9 @@ let spawnerId = null;
 export const initCatSpawner = (scene) => {
     let spawnRow = {y: 2, z: 2};
 
-    const createCat = () => {
+    const createCat = (retryCount) => {
+        if(retryCount > 5) return;
+
         // Generate a random x value between -2 and 2 for the cat to spawn at
         let x = randomIntFromInterval(-2, 2);
 
@@ -23,12 +25,12 @@ export const initCatSpawner = (scene) => {
         if (!catAlreadyExists)
             spawnCat(scene, "standard", x, spawnRow.z, spawnRow.y);
         else
-            createCat();
+            createCat(retryCount + 1);
     }
 
     // Every 5 seconds, spawn a cat
     spawnerId = setInterval(() => {
-        createCat();
+        createCat(0);
     }, 2000);
 }
 

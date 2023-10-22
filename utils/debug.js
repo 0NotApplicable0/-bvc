@@ -77,7 +77,6 @@ export let fullscreen_ui = null;
 export const initDebugUtilities = (scene) => {
     gizmoManager = new GizmoManager(scene);
     debug_char = createBox(scene, 100, 0, 2, new Color3(0, 1, 0));
-    fullscreen_ui = AdvancedDynamicTexture.CreateFullscreenUI("myUI");
 
     //region Display debug_char position
     // let debugCharPos = new TextBlock();

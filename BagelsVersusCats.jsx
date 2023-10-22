@@ -6,10 +6,13 @@ import {Debug} from "@babylonjs/core/Legacy/legacy.js";
 import {SceneManager} from "./containers/SceneManager.jsx";
 import {bagelLogicTick} from "./components/bagel_logic.js";
 import {catLogicTick} from "./components/cat_logic.js";
-import {stateLogicTick} from "./components/state_logic.js";
+import {initStateLogic, stateLogicCleanup, stateLogicTick} from "./components/state_logic.js";
 import HavokPhysics from "@babylonjs/havok";
 import {initBuyMenu} from "./containers/buy_menu.js";
 import {catSpawnerTick, initCatSpawner} from "./containers/cat_spawner.js";
+import {initPlayerLogic} from "./components/player_logic.js";
+import {initUiLogic, uiLogicTick} from "./components/ui_logic.js";
+import {useEffect} from "react";
 
 //region PROTOTYPES
 Mesh.prototype.showLocalAxis = function () {
@@ -45,8 +48,11 @@ export default function BagelsVersusCats() {
 
         // COMPONENT SETUP //
         initBuyMenu(scene, camera, canvas);
-        // initCatSpawner(scene);
+        initCatSpawner(scene);
         initDebugUtilities(scene);
+        initPlayerLogic(scene);
+        initUiLogic(scene);
+        initStateLogic(scene);
     }
 
     /**
@@ -58,7 +64,14 @@ export default function BagelsVersusCats() {
         bagelLogicTick(scene);
         catLogicTick(scene);
         catSpawnerTick(scene);
+        uiLogicTick(scene)
     }
+
+    useEffect(() => {
+        return () => {
+            stateLogicCleanup();
+        }
+    }, []);
 
     return (
         <div id={"game-container"}>

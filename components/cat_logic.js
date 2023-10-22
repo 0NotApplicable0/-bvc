@@ -8,7 +8,7 @@ import clone from 'just-clone';
 const availableCats = [{
     name: "standard",
     color: new Color3(1, 0, 0),
-    health: 200,
+    health: 100,
 }]
 
 export const spawnCat = (scene, type, x, y, z) => {
@@ -56,8 +56,9 @@ export const catLogicTick = (scene) => {
 
             // Hit Detection //
             let hit = scene.pickWithRay(ray);
-            if (hit.pickedMesh && hit.pickedMesh.type && hit.pickedMesh.type.health && hit.pickedMesh.type.type === "bagel") {
-                hit.pickedMesh.type.health -= 1;
+            if (hit.pickedMesh && hit.pickedMesh.type && hit.pickedMesh.type.health) {
+                if(hit.pickedMesh.type.type === "bagel")
+                    hit.pickedMesh.type.health -= 1;
             } else if (foundCat.position.z - 1 / 200 < -2) {
                 // YOU LOSE! //
                 setGameState(GAME_STATES.GAME_OVER);
