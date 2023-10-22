@@ -59,4 +59,10 @@ export const bagelLogicTick = (scene) => {
         bagel.update(scene);
     });
 }
+
+export const bagelLogicCleanup = (scene) => {
+    bagels.forEach((bagel) => {
+        bagel.cleanup(scene);
+    });
+}
 //endregion

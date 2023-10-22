@@ -72,7 +72,7 @@ export default class GeneratorBagel extends Bagel {
         sprite.position.y = z;
 
         // Create invisible mesh for raycasting
-        let mesh = createBox(scene, x, y, z, color, this.name, 1);
+        let mesh = createBox(scene, x, y, z, color, this.name, 0);
 
         if (!this.isDisabled) {
             mesh.actionManager = new ActionManager(scene);
@@ -128,6 +128,15 @@ export default class GeneratorBagel extends Bagel {
     update(scene) {
         super.update(scene);
         this.timedBuildHarvest()
+    }
+
+    cleanup(scene) {
+        super.cleanup(scene);
+        if (this.emissions) {
+            this.emissions.stop();
+            this.emissions.dispose();
+            this.emissions = null;
+        }
     }
 
     //endregion

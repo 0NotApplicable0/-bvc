@@ -40,14 +40,17 @@ export default class StandardBagel extends Bagel {
                 let foundCat = cats.find((cat) => cat.id === hit.pickedMesh.id);
                 foundCat.health -= this.damage;
                 projectile.dispose();
+                this.localIntervals.splice(this.localIntervals.indexOf(projectileLoop), 1);
                 clearInterval(projectileLoop);
             } else if (projectile.position.z + 0.01 > 2) {
                 projectile.dispose();
+                this.localIntervals.splice(this.localIntervals.indexOf(projectileLoop), 1);
                 clearInterval(projectileLoop);
             } else {
                 projectile.position.z += 0.01;
             }
         }, 10);
+        this.localIntervals.push(projectileLoop);
     }
 
     timedFireProjectile(scene) {
@@ -147,6 +150,9 @@ export default class StandardBagel extends Bagel {
         if (cats.find((cat) => cat.mesh.position.y === currentY && cat.mesh.position.x === currentX)) {
             this.timedFireProjectile(scene);
         }
+    }
+
+    cleanup(scene) {
     }
 
     //endregion

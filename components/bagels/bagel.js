@@ -9,6 +9,7 @@ export default class Bagel {
         this.damage = damage;
         this.cost = cost;
         this.initialized = false;
+        this.localIntervals = [];
     }
 
     //region Lifecycle
@@ -29,5 +30,12 @@ export default class Bagel {
         this.healthBarMesh.width = (this.health / 100 / 2);
     }
 
+    cleanup(scene) {
+        this.localIntervals.forEach((interval) => {
+            clearInterval(interval);
+        });
+        this.mesh.dispose();
+        this.sprite.dispose();
+    }
     //endregion
 }

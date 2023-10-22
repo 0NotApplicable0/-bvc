@@ -1,6 +1,6 @@
 import {TextBlock} from "@babylonjs/gui";
 import {createBox, randomIntFromInterval} from "../utils/debug.js";
-import {Color3, PointerEventTypes, Vector3} from "@babylonjs/core";
+import {ActionManager, Color3, ExecuteCodeAction, PointerEventTypes, Vector3} from "@babylonjs/core";
 import {addWheat} from "./player_logic.js";
 import {fullscreen_ui} from "./ui_logic.js";
 
@@ -38,6 +38,16 @@ export const startWheatDrops = (scene) => {
         let wheat = createBox(scene, x, y, 16, new Color3(1, 0.8, 0.2), "wheat");
         wheat.scaling = new Vector3(0.2, 1, 0.2);
 
+        wheat.actionManager = new ActionManager(scene);
+        wheat.actionManager.registerAction(
+            new ExecuteCodeAction(
+                ActionManager.OnPickTrigger,
+                (evt) => {
+                    collectWheat(wheat);
+                }
+            )
+        );
+
         let wheatDropper = setInterval(() => {
             // Make wheat fall and check if it hits the ground //
             if (wheat.position.y <= 2) {
@@ -59,18 +69,7 @@ export const startWheatDrops = (scene) => {
 //endregion
 
 //region Lifecycle
-export const initStateLogic = (scene) => {
-    // Wheat Collection //
-    scene.onPointerObservable.add((pointerInfo) => {
-        switch (pointerInfo.type) {
-            case PointerEventTypes.POINTERDOWN:
-                if (pointerInfo.pickInfo.hit && pointerInfo.pickInfo.pickedMesh.name === "wheat") {
-                    collectWheat(pointerInfo.pickInfo.pickedMesh);
-                }
-                break;
-        }
-    });
-}
+export const initStateLogic = (scene) => {}
 
 export const stateLogicTick = (scene) => {
     if (CURRENT_GAME_STATE === GAME_STATES.GAME_OVER) {
