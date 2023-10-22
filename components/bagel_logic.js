@@ -72,6 +72,7 @@ export const spawnBagel = (scene, type, x, y, z) => {
     let bagelType = clone(availableBagels.find((bagel) => bagel.name === type));
     let newBagel = createBox(scene, x, y, z, bagelType.color, bagelType.name);
     newBagel.type = bagelType;
+    newBagel.type.type = "bagel";
     newBagel.id = crypto.randomUUID();
 
     // Create Bagel Health Bar Mesh //
@@ -118,7 +119,7 @@ export const bagelLogicTick = (scene) => {
         // rayHelper.show(scene, new Color3(1, 0, 0));
 
         let hit = scene.pickWithRay(ray);
-        if (hit.pickedMesh && hit.pickedMesh.type && hit.pickedMesh.type.health) {
+        if (hit.pickedMesh && hit.pickedMesh.type && hit.pickedMesh.type.health && hit.pickedMesh.type.type === "cat") {
             // console.log("actionTick fired for: ", bagel.id);
             bagel.actionTick && bagel.actionTick(scene, bagel);
         }

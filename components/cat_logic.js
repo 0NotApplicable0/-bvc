@@ -18,6 +18,7 @@ export const spawnCat = (scene, type, x, y, z) => {
     let catType = clone(availableCats.find((cat) => cat.name === type));
     let newCat = createBox(scene, x, y, z, catType.color, catType.name);
     newCat.type = catType;
+    newCat.type.type = "cat";
     newCat.id = crypto.randomUUID();
 
     // Create Cat Health Bar Mesh //
@@ -55,7 +56,7 @@ export const catLogicTick = (scene) => {
 
             // Hit Detection //
             let hit = scene.pickWithRay(ray);
-            if (hit.pickedMesh && hit.pickedMesh.type && hit.pickedMesh.type.health) {
+            if (hit.pickedMesh && hit.pickedMesh.type && hit.pickedMesh.type.health && hit.pickedMesh.type.type === "bagel") {
                 hit.pickedMesh.type.health -= 1;
             } else if (foundCat.position.z - 1 / 200 < -2) {
                 // YOU LOSE! //
