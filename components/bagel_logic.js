@@ -1,30 +1,58 @@
 import {bagels} from "../BagelsVersusCats.jsx";
-import {Color3, MeshBuilder, Ray, RayHelper, Vector3} from "@babylonjs/core";
+import {Color3, MeshBuilder, ParticleHelper, PointerEventTypes, Ray, RayHelper, Vector3} from "@babylonjs/core";
 import {createBox} from "../utils/debug.js";
 import {AdvancedDynamicTexture, Rectangle} from "@babylonjs/gui";
 import clone from "just-clone";
+import {addWheat} from "./player_logic.js";
 
 export const availableBagels = [{
     name: "standard",
     color: new Color3(0.337, 0.8, 0.468),
     health: 50000,
     damage: 35,
+    cost: 1
 }, {
     name: "sesame",
     color: new Color3(0.87, 0.5, 0.128),
     health: 100,
     damage: 15,
+    cost: 2
 }, {
     name: "everything",
     color: new Color3(0.647, 0.4, 0.128),
     health: 100,
     damage: 15,
+    cost: 3
 }, {
     name: "poppy",
     color: new Color3(0.17, 0.4, 0.168),
     health: 100,
     damage: 15,
+    cost: 4
+}, {
+    name: "generator",
+    color: new Color3(0.2, 0.2, 0.2),
+    health: 10000,
+    damage: 15,
+    cost: 1
 }]
+
+const buildHarvest = (scene, bagel) => {
+    if(bagel.readyToHarvest) return;
+    console.log("Building Harvest: ", bagel.id, bagel.harvestCount);
+    let operatingBagel = scene.getMeshById(bagel.id);
+    if(bagel.harvestCount >= 10) {
+        bagel.harvestCount = 0;
+        let emissions = ParticleHelper.CreateDefault(operatingBagel.position);
+        emissions.start();
+        bagel.readyToHarvest = true;
+        bagel.emissions = emissions;
+    }
+    else {
+        if (bagel.harvestCount === undefined) bagel.harvestCount = 0;
+        bagel.harvestCount += 1;
+    }
+}
 
 const fireProjectile = (scene, bagel) => {
     let operatingBagel = scene.getMeshById(bagel.id)
@@ -58,15 +86,6 @@ const fireProjectile = (scene, bagel) => {
     }, 10);
 }
 
-const bagelActionTick = (scene, bagel) => {
-    let timeNow = Date.now();
-    let timePassed = (timeNow - bagel.timeThen) / 1000;
-    if (timePassed >= 1) {
-        bagel.timeThen = timeNow;
-        fireProjectile(scene, bagel);
-    }
-}
-
 export const spawnBagel = (scene, type, x, y, z) => {
     // Create Bagel Mesh //
     let bagelType = clone(availableBagels.find((bagel) => bagel.name === type));
@@ -91,6 +110,38 @@ export const spawnBagel = (scene, type, x, y, z) => {
 
     // Add Bagel to State //
     bagels.push({...newBagel, healthBar: healthBar, timeThen: Date.now(), actionTick: bagelActionTick});
+}
+
+const bagelActionTick = (scene, bagel) => {
+    let timeNow = Date.now();
+    let timePassed = (timeNow - bagel.timeThen) / 1000;
+    if (timePassed >= 1) {
+        bagel.timeThen = timeNow;
+        if (bagel.type.name === "generator"){
+            buildHarvest(scene, bagel);
+        }
+        else
+            fireProjectile(scene, bagel);
+    }
+}
+
+export const initBagelLogic = (scene) => {
+    scene.onPointerObservable.add((pointerInfo) => {
+        switch (pointerInfo.type) {
+            case PointerEventTypes.POINTERDOWN:
+                if(pointerInfo.pickInfo.hit && bagels.find((mesh) => mesh.id === pointerInfo.pickInfo.pickedMesh.id)) {
+                    let bagel = bagels.find((mesh) => mesh.id === pointerInfo.pickInfo.pickedMesh.id);
+                    if(bagel.type.name === "generator" && bagel.readyToHarvest) {
+                        addWheat(1);
+                        bagel.readyToHarvest = false;
+                        bagel.emissions.stop();
+                        bagel.emissions.dispose();
+                        bagel.emissions = null;
+                    }
+                }
+                break;
+        }
+    });
 }
 
 export const bagelLogicTick = (scene) => {

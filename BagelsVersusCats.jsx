@@ -4,7 +4,7 @@ import {createPlatform, debugUtilitiesTick, initDebugUtilities} from "./utils/de
 import "./styles.css";
 import {Debug} from "@babylonjs/core/Legacy/legacy.js";
 import {SceneManager} from "./containers/SceneManager.jsx";
-import {bagelLogicTick} from "./components/bagel_logic.js";
+import {bagelLogicTick, initBagelLogic} from "./components/bagel_logic.js";
 import {catLogicTick} from "./components/cat_logic.js";
 import {initStateLogic, stateLogicCleanup, stateLogicTick} from "./components/state_logic.js";
 import HavokPhysics from "@babylonjs/havok";
@@ -53,6 +53,7 @@ export default function BagelsVersusCats() {
         initPlayerLogic(scene);
         initUiLogic(scene);
         initStateLogic(scene);
+        initBagelLogic(scene);
     }
 
     /**
