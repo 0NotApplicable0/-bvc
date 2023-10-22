@@ -1,19 +1,17 @@
 import {Color3, GizmoManager, KeyboardEventTypes, MeshBuilder, PointerEventTypes, Vector3} from "@babylonjs/core";
 import {GridMaterial} from "@babylonjs/materials";
-import {bagels, board} from "../BagelsVersusCats.jsx";
-import {AdvancedDynamicTexture, TextBlock} from "@babylonjs/gui";
+import {bagels} from "../BagelsVersusCats.jsx";
 import {Inspector} from "@babylonjs/inspector";
-import {spawnBagel} from "../components/bagel_logic.js";
-import {spawnCat} from "../components/cat_logic.js";
+import {spawnCat} from "../logic/cat_logic.js";
 
 //region Helper functions
-export const createBox = (scene, x, y, z, color, name) => {
+export const createBox = (scene, x, y, z, color, name, opacity) => {
     let box = MeshBuilder.CreateBox(name === undefined ? "box" : name, {size: 1}, scene);
     box.position.x = x;
     box.position.z = y;
     box.position.y = z;
 
-    let material = new GridMaterial("myMaterial", scene);
+    let material = new GridMaterial("bagel_material", scene);
     material.lineColor = new Color3(0.2, 0.2, 0.2);
     material.minorUnitVisibility = 0;
     material.gridOffset = new Vector3(0.5, 0.5, 0.5);
@@ -21,6 +19,7 @@ export const createBox = (scene, x, y, z, color, name) => {
     material.diffuseColor = new Color3(0.667, 0.4, 0.168);
 
     material.mainColor = color;
+    material.opacity = opacity;
     box.material = material;
     return box;
 }
@@ -72,8 +71,7 @@ export const randomIntFromInterval = (min, max) => {
 
 let gizmoManager = null;
 let debug_char = null;
-export let fullscreen_ui = null;
-
+//region Lifecycle
 export const initDebugUtilities = (scene) => {
     gizmoManager = new GizmoManager(scene);
     debug_char = createBox(scene, 100, 0, 2, new Color3(0, 1, 0));
@@ -125,33 +123,24 @@ export const initDebugUtilities = (scene) => {
                 break;
         }
     });
-    scene.onPointerObservable.add((pointerInfo) => {
-        switch (pointerInfo.type) {
-            case PointerEventTypes.POINTERDOWN:
-                if(pointerInfo.pickInfo.hit && bagels.find((mesh) => mesh.id === pointerInfo.pickInfo.pickedMesh.id)) {
-                    bagels.find((mesh) => mesh.id === pointerInfo.pickInfo.pickedMesh.id).type.health -= 50;
-                }
-                break;
-        }
-    });
     //endregion
 
     // debug_char.showLocalAxis();
     // cats.push(crewateBox(scene, -2, 2, 2, new Color3(1, 0, 0)));
     // cats.push(createBox(scene, -1, 2, 2, new Color3(1, 0, 0)));
-    spawnBagel(scene, "standard", -2, -2, 2);
-    spawnBagel(scene, "standard", -1, -2, 2);
-    spawnBagel(scene, "standard", 0, -2, 2);
-    spawnBagel(scene, "standard", 1, -2, 2);
-    spawnBagel(scene, "standard", 2, -2, 2);
-    spawnCat(scene, "standard", -2, 2, 2);
-    spawnCat(scene, "standard", -1, 2, 2);
-    spawnCat(scene, "standard", 0, 2, 2);
-    spawnCat(scene, "standard", 1, 2, 2);
-    spawnCat(scene, "standard", 2, 2, 2);
-
+    // spawnBagel(scene, "standard", -2, -2, 2);
+    // spawnBagel(scene, "standard", -1, -2, 2);
+    // spawnBagel(scene, "standard", 0, -2, 2);
+    // spawnBagel(scene, "standard", 1, -2, 2);
+    // spawnBagel(scene, "standard", 2, -2, 2);
+    // spawnCat(scene, "standard", -2, 2, 2);
+    // spawnCat(scene, "standard", -1, 2, 2);
+    // spawnCat(scene, "standard", 0, 2, 2);
+    // spawnCat(scene, "standard", 1, 2, 2);
+    // spawnCat(scene, "standard", 2, 2, 2);
 }
 
 export const debugUtilitiesTick = (scene) => {
     // fullscreen_ui.getControlByName("DebugCharPos").text = "Character Position: " + debug_char.position.x + ", " + debug_char.position.y + ", " + debug_char.position.z;
 }
+//endregion

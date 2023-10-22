@@ -1,8 +1,13 @@
 import {TextBlock} from "@babylonjs/gui";
-import {createBox, fullscreen_ui, randomIntFromInterval} from "../utils/debug.js";
+import {createBox, randomIntFromInterval} from "../utils/debug.js";
 import {Color3, PointerEventTypes, Vector3} from "@babylonjs/core";
 import {addWheat} from "./player_logic.js";
+import {fullscreen_ui} from "./ui_logic.js";
 
+// Used for react component cleanup, not related to the game //
+let localIntervals = [];
+
+//region Game States and Statuses
 export const GAME_STATES = {
     LOADING: "LOADING",
     MAIN_MENU: "MAIN_MENU",
@@ -12,9 +17,9 @@ export const GAME_STATES = {
 }
 export let CURRENT_GAME_STATE = GAME_STATES.IN_GAME;
 export let HAS_WHEAT_DROP_STARTED = false;
+//endregion
 
-let localIntervals = [];
-
+//region Game State Functions
 export const setGameState = (newGameState) => {
     CURRENT_GAME_STATE = newGameState;
 }
@@ -51,7 +56,9 @@ export const startWheatDrops = (scene) => {
 
     return wheatDropId;
 }
+//endregion
 
+//region Lifecycle
 export const initStateLogic = (scene) => {
     // Wheat Collection //
     scene.onPointerObservable.add((pointerInfo) => {
@@ -89,3 +96,4 @@ export const stateLogicCleanup = () => {
     });
     localIntervals = [];
 }
+//endregion

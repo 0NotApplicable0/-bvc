@@ -4,14 +4,14 @@ import {createPlatform, debugUtilitiesTick, initDebugUtilities} from "./utils/de
 import "./styles.css";
 import {Debug} from "@babylonjs/core/Legacy/legacy.js";
 import {SceneManager} from "./containers/SceneManager.jsx";
-import {bagelLogicTick, initBagelLogic} from "./components/bagel_logic.js";
-import {catLogicTick} from "./components/cat_logic.js";
-import {initStateLogic, stateLogicCleanup, stateLogicTick} from "./components/state_logic.js";
+import {bagelLogicTick, initBagelLogic} from "./logic/bagel_logic.js";
+import {catLogicTick, initCatLogic} from "./logic/cat_logic.js";
+import {initStateLogic, stateLogicCleanup, stateLogicTick} from "./logic/state_logic.js";
 import HavokPhysics from "@babylonjs/havok";
 import {initBuyMenu} from "./containers/buy_menu.js";
 import {catSpawnerTick, initCatSpawner} from "./containers/cat_spawner.js";
-import {initPlayerLogic} from "./components/player_logic.js";
-import {initUiLogic, uiLogicTick} from "./components/ui_logic.js";
+import {initPlayerLogic} from "./logic/player_logic.js";
+import {initUiLogic, uiLogicTick} from "./logic/ui_logic.js";
 import {useEffect} from "react";
 
 //region PROTOTYPES
@@ -28,8 +28,6 @@ Mesh.prototype.hideLocalAxis = function () {
 //endregion
 
 //region STATE
-export let bagels = [];
-export let cats = [];
 export let board = [];
 export let ground = null;
 //endregion
@@ -39,11 +37,10 @@ export default function BagelsVersusCats() {
      * Will run when the scene is ready
      */
     const onSceneReady = (scene) => {
+        // SCENE GENERATION //
         scene.clearColor = new Color4(1, 1, 1, 1);
         const canvas = scene.getEngine().getRenderingCanvas();
         const camera = cameraSetup(scene, canvas);
-
-        // SCENE GENERATION //
         ground = createPlatform(scene);
 
         // COMPONENT SETUP //
@@ -54,6 +51,7 @@ export default function BagelsVersusCats() {
         initUiLogic(scene);
         initStateLogic(scene);
         initBagelLogic(scene);
+        initCatLogic(scene);
     }
 
     /**

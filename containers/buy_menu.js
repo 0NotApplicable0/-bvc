@@ -1,10 +1,11 @@
-import {createBox} from "../utils/debug.js";
-import {Color3, HighlightLayer, Mesh, MeshBuilder, PointerEventTypes, Vector3} from "@babylonjs/core";
-import {board, ground} from "../BagelsVersusCats.jsx";
+import {ActionManager, Color3, ExecuteCodeAction, Mesh, MeshBuilder, PointerEventTypes, Vector3} from "@babylonjs/core";
+import {ground} from "../BagelsVersusCats.jsx";
 import {GridMaterial} from "@babylonjs/materials";
-import {AdvancedDynamicTexture, Rectangle, TextBlock} from "@babylonjs/gui";
-import {availableBagels, spawnBagel} from "../components/bagel_logic.js";
-import {PLAYER_WHEAT, removeWheat} from "../components/player_logic.js";
+import {AdvancedDynamicTexture, TextBlock} from "@babylonjs/gui";
+import {addBagel, availableBagels} from "../logic/bagel_logic.js";
+import {PLAYER_WHEAT, removeWheat} from "../logic/player_logic.js";
+import StandardBagel from "../components/bagels/standard_bagel.js";
+import GeneratorBagel from "../components/bagels/generator_bagel.js";
 
 export const initBuyMenu = (scene, camera, canvas) => {
     let bagels = null;
@@ -31,39 +32,28 @@ export const initBuyMenu = (scene, camera, canvas) => {
     }
 
     const selectBuyOption = (pointerInfo) => {
-        if (selectedMesh === null && pointerInfo.pickInfo.hit && bagels.includes(pointerInfo.pickInfo.pickedMesh)) {
-            selectedMesh = pointerInfo.pickInfo.pickedMesh;
-
-            if(PLAYER_WHEAT < selectedMesh.type.cost) {
-                selectedMesh = null;
-                alert("You don't have enough wheat to buy that!");
-                return;
-            }
-
-            selectedMesh.renderOutline = true;
-            selectedMesh.outlineColor = new Color3(0, 1, 0);
-            selectedMesh.outlineWidth = 0.1;
-            highlightPlacementOptions();
-        } else if (selectedMesh !== null && pointerInfo.pickInfo.hit && bagels.includes(pointerInfo.pickInfo.pickedMesh)) {
-            selectedMesh.renderOutline = false;
-            selectedMesh = pointerInfo.pickInfo.pickedMesh;
-
-            if(PLAYER_WHEAT < selectedMesh.type.cost) {
-                selectedMesh = null;
-                alert("You don't have enough wheat to buy that!");
-                return;
-            }
-
-            selectedMesh.renderOutline = true;
-            selectedMesh.outlineColor = new Color3(0, 1, 0);
-            selectedMesh.outlineWidth = 0.1;
-            highlightPlacementOptions();
-        } else if (selectedMesh !== null && pointerInfo.pickInfo.hit && ground.includes(pointerInfo.pickInfo.pickedMesh)) {
+        if (selectedMesh !== null && pointerInfo.pickInfo.hit && ground.includes(pointerInfo.pickInfo.pickedMesh)) {
             let newBagelPlacement = ground.find((platform) => platform === pointerInfo.pickInfo.pickedMesh).position;
 
             // Spawn Bagel
-            removeWheat(selectedMesh.type.cost);
-            spawnBagel(scene, selectedMesh.type.name, newBagelPlacement.x, newBagelPlacement.z, newBagelPlacement.y + 1);
+            removeWheat(selectedMesh.metadata.cost);
+            let newBagel = null
+            switch (selectedMesh.metadata.name) {
+                case "standard":
+                    newBagel = new StandardBagel();
+                    newBagel.init(scene, newBagelPlacement.x, newBagelPlacement.z, newBagelPlacement.y + 1);
+                    addBagel(newBagel)
+                    break;
+                case "generator":
+                    newBagel = new GeneratorBagel();
+                    newBagel.init(scene, newBagelPlacement.x, newBagelPlacement.z, newBagelPlacement.y + 1);
+                    addBagel(newBagel)
+                default:
+                    newBagel = new StandardBagel();
+                    newBagel.init(scene, newBagelPlacement.x, newBagelPlacement.z, newBagelPlacement.y + 1);
+                    addBagel(newBagel)
+                    break;
+            }
 
             // Reset
             selectedMesh.renderOutline = false;
@@ -80,12 +70,28 @@ export const initBuyMenu = (scene, camera, canvas) => {
 
     const createBuyOptions = () => {
         const createInScene = (x, y, z, bagel) => {
-            let createdBagel = createBox(scene, x, y, z, bagel.color, bagel.name);
-            createdBagel.type = bagel;
-            createdBagel.scaling = new Vector3(0.5, 0.5, 0.5);
+            let createdBagel = null;
+            switch (bagel.name) {
+                case "standard":
+                    createdBagel = new StandardBagel(true);
+                    break;
+                case "generator":
+                    createdBagel = new GeneratorBagel(true);
+                    break;
+                default:
+                    createdBagel = new StandardBagel(true);
+                    break;
+            }
+
+            //region Create Entity
+            createdBagel.init(scene, x, y, z);
+            createdBagel.mesh.metadata = {name: bagel.name, cost: bagel.cost};
+            createdBagel.mesh.scaling = new Vector3(0.5, 0.5, 0.5);
+            createdBagel.sprite.width = 0.7;
+            createdBagel.sprite.height = 0.7;
 
             let guiPlane = MeshBuilder.CreatePlane("plane", {size: 1}, scene);
-            guiPlane.parent = createdBagel;
+            guiPlane.parent = createdBagel.mesh;
             guiPlane.position.x = -2;
             guiPlane.position.y = -1.5;
             guiPlane.billboardMode = Mesh.BILLBOARDMODE_ALL;
@@ -108,6 +114,37 @@ export const initBuyMenu = (scene, camera, canvas) => {
 
             gui.addControl(wheatCost);
             gui.addControl(bagelName);
+            //endregion
+
+            //region Add Actions
+            createdBagel.mesh.actionManager = new ActionManager(scene);
+            createdBagel.mesh.actionManager.registerAction(
+                new ExecuteCodeAction(
+                    ActionManager.OnPickTrigger,
+                    (evt) => {
+                        if (PLAYER_WHEAT < createdBagel.cost) {
+                            selectedMesh = null;
+                            alert("You don't have enough wheat to buy that!");
+                            return;
+                        }
+
+                        if (selectedMesh) {
+                            selectedMesh.renderOutline = false;
+                        } else if (selectedMesh === createdBagel.mesh) {
+                            selectedMesh = null;
+                            unhighlightPlacementOptions();
+                            return;
+                        }
+
+                        selectedMesh = createdBagel.mesh;
+                        selectedMesh.renderOutline = true;
+                        selectedMesh.outlineColor = new Color3(0, 1, 0);
+                        selectedMesh.outlineWidth = 0.1;
+                        highlightPlacementOptions();
+                    }
+                )
+            );
+            //endregion
 
             return createdBagel;
         }

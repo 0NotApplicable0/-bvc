@@ -1,7 +1,7 @@
+import {CURRENT_GAME_STATE, GAME_STATES} from "../logic/state_logic.js";
 import {randomIntFromInterval} from "../utils/debug.js";
-import {cats, gameState} from "../BagelsVersusCats.jsx";
-import {spawnCat} from "../components/cat_logic.js";
-import {CURRENT_GAME_STATE, GAME_STATES} from "../components/state_logic.js";
+import {cats} from "../logic/cat_logic.js";
+import StandardCat from "../components/cats/standard_cat.js";
 
 let spawnerId = null;
 export const initCatSpawner = (scene) => {
@@ -22,8 +22,11 @@ export const initCatSpawner = (scene) => {
                 && Math.ceil(foundCat.position.z) === 2;
         });
 
-        if (!catAlreadyExists)
-            spawnCat(scene, "standard", x, spawnRow.z, spawnRow.y);
+        if (!catAlreadyExists){
+            let newCat = new StandardCat();
+            newCat.init(scene, x, spawnRow.y, spawnRow.z);
+            cats.push(newCat);
+        }
         else
             createCat(retryCount + 1);
     }
@@ -35,5 +38,5 @@ export const initCatSpawner = (scene) => {
 }
 
 export const catSpawnerTick = (scene) => {
-    if(CURRENT_GAME_STATE === GAME_STATES.GAME_OVER) clearInterval(spawnerId);
+    if (CURRENT_GAME_STATE === GAME_STATES.GAME_OVER) clearInterval(spawnerId);
 }

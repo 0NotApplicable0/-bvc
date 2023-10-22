@@ -3,6 +3,7 @@ import {PLAYER_WHEAT} from "./player_logic.js";
 
 export let fullscreen_ui = null;
 
+//region Lifecycle
 export const initUiLogic = (scene) => {
     fullscreen_ui = AdvancedDynamicTexture.CreateFullscreenUI("myUI");
 
@@ -23,3 +24,4 @@ export const uiLogicTick = (scene) => {
     let wheatCounter = fullscreen_ui.getControlByName("WheatCounter");
     wheatCounter.text = "Current Wheat: " + PLAYER_WHEAT;
 }
+//endregion
