@@ -1,15 +1,17 @@
-import {cats} from "../../logic/cat_logic.js";
-import {Ray, Vector3} from "@babylonjs/core";
+import {cats, removeCat} from "../../logic/cat_logic.js";
+import {Color3, Color4, Mesh, MeshBuilder, Ray, Sprite, SpriteManager, Tags, Vector3} from "@babylonjs/core";
 import {bagels} from "../../logic/bagel_logic.js";
 import {GAME_STATES, setGameState} from "../../logic/state_logic.js";
+import image from "../../assets/skippy.png";
+import {createBox} from "../../utils/debug.js";
+import {AdvancedDynamicTexture, Rectangle} from "@babylonjs/gui";
+import Entity from "../entity.js";
 
-export default class Cat {
+export default class Cat extends Entity{
     constructor(name, health, damage) {
-        this.name = name;
-        this.id = crypto.randomUUID();
+        super(name);
         this.health = health;
         this.damage = damage;
-        this.initialized = false;
     }
 
     //region Functions
@@ -17,20 +19,42 @@ export default class Cat {
         this.mesh.position.z -= 1 / 200;
         this.sprite.position.z -= 1 / 200;
     }
-
     //endregion
 
     //region Lifecycle
-    init(scene) {
+    init(scene, x, y, z, spriteManagerOptions) {
+        super.init(scene, x, y, z, spriteManagerOptions);
+
+        // Create Health Bar
+        // Create Cat Health Bar Mesh //
+        let guiPlane = MeshBuilder.CreatePlane("health_plane_" + this.name + "_cat_" + this.id, {size: 1}, scene);
+        guiPlane.parent = this.mesh;
+        guiPlane.position.y = 1;
+        guiPlane.billboardMode = Mesh.BILLBOARDMODE_ALL;
+
+        let gui = AdvancedDynamicTexture.CreateForMesh(guiPlane, 200, 100);
+        let healthBar = new Rectangle();
+        healthBar.width = (this.health / 100 / 2);
+        healthBar.height = "10px";
+        healthBar.color = "black";
+        healthBar.background = "red";
+        healthBar.thickness = 1;
+        gui.addControl(healthBar);
+
+        Tags.EnableFor(this.mesh);
+        Tags.AddTagsTo(this.mesh, "cat");
+
+        this.healthBarMesh = healthBar;
+        this.healthBarGui = gui;
+        this.healthBarGuiPlane = guiPlane;
     }
 
     update(scene) {
+        super.update(scene);
+
         // Cat Death Check //
         if (this.health <= 0) {
-            this.mesh.dispose();
-            this.sprite.dispose();
-            let index = cats.findIndex((cat) => cat.id === this.id);
-            cats.splice(index, 1);
+            this.cleanup();
             return;
         }
 
@@ -57,5 +81,13 @@ export default class Cat {
         }
     }
 
+    cleanup() {
+        super.cleanup();
+
+        removeCat(this);
+        this.healthBarMesh.dispose();
+        this.healthBarGui.dispose();
+        this.healthBarGuiPlane.dispose(true, true);
+    }
     //endregion
 }

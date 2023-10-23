@@ -1,28 +1,51 @@
-import {bagels} from "../../logic/bagel_logic.js";
-import {Color3, Ray, RayHelper, Vector3} from "@babylonjs/core";
+import {removeBagel} from "../../logic/bagel_logic.js";
+import {Mesh, MeshBuilder, Tags} from "@babylonjs/core";
+import {AdvancedDynamicTexture, Rectangle} from "@babylonjs/gui";
+import Entity from "../entity.js";
 
-export default class Bagel {
+export default class Bagel extends Entity {
     constructor(name, health, damage, cost) {
-        this.name = name;
-        this.id = crypto.randomUUID();
+        super(name);
         this.health = health;
         this.damage = damage;
         this.cost = cost;
-        this.initialized = false;
-        this.localIntervals = [];
     }
 
     //region Lifecycle
-    init(scene) {
+    init(scene, name, x, y, z, spriteManagerOptions) {
+        super.init(scene, x, y, z, spriteManagerOptions);
+
+        if (!this.isDisabled) {
+            // Create Health Bar //
+            let guiPlane = MeshBuilder.CreatePlane("health_plane_" + this.name + "_bagel_" + this.id, {size: 1}, scene);
+            guiPlane.parent = this.mesh;
+            guiPlane.position.y = 1;
+            guiPlane.billboardMode = Mesh.BILLBOARDMODE_ALL;
+
+            let gui = AdvancedDynamicTexture.CreateForMesh(guiPlane, 200, 100);
+            let healthBar = new Rectangle();
+            healthBar.width = (this.health / 100 / 2);
+            healthBar.height = "10px";
+            healthBar.color = "black";
+            healthBar.background = "red";
+            healthBar.thickness = 1;
+            gui.addControl(healthBar);
+
+            Tags.EnableFor(this.mesh);
+            Tags.AddTagsTo(this.mesh, "bagel");
+
+            this.healthBarMesh = healthBar;
+            this.healthBarGui = gui;
+            this.healthBarGuiPlane = guiPlane;
+        }
     }
 
     update(scene) {
+        super.update(scene);
+
         // Bagel Death Check //
         if (this.health <= 0) {
-            this.mesh.dispose();
-            this.sprite.dispose();
-            let index = bagels.findIndex((bagel) => bagel.id === this.id);
-            bagels.splice(index, 1);
+            this.cleanup();
             return
         }
 
@@ -30,12 +53,16 @@ export default class Bagel {
         this.healthBarMesh.width = (this.health / 100 / 2);
     }
 
-    cleanup(scene) {
-        this.localIntervals.forEach((interval) => {
-            clearInterval(interval);
-        });
-        this.mesh.dispose();
-        this.sprite.dispose();
+    cleanup() {
+        super.cleanup();
+
+        removeBagel(this);
+        if (this.healthBarMesh) {
+            this.healthBarMesh.dispose();
+            this.healthBarGui.dispose();
+            this.healthBarGuiPlane.dispose(false, true);
+        }
     }
+
     //endregion
 }

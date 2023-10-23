@@ -34,9 +34,13 @@ export const initCatSpawner = (scene) => {
     // Every 5 seconds, spawn a cat
     spawnerId = setInterval(() => {
         createCat(0);
-    }, 2000);
+    }, 1000);
 }
 
 export const catSpawnerTick = (scene) => {
     if (CURRENT_GAME_STATE === GAME_STATES.GAME_OVER) clearInterval(spawnerId);
+}
+
+export const catSpawnerCleanup = (scene) => {
+    clearInterval(spawnerId);
 }

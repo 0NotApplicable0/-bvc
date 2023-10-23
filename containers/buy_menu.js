@@ -2,7 +2,7 @@ import {ActionManager, Color3, ExecuteCodeAction, Mesh, MeshBuilder, PointerEven
 import {ground} from "../BagelsVersusCats.jsx";
 import {GridMaterial} from "@babylonjs/materials";
 import {AdvancedDynamicTexture, TextBlock} from "@babylonjs/gui";
-import {addBagel, availableBagels} from "../logic/bagel_logic.js";
+import {addBagel, availableBagels, createBagel, getCorrespondingBagel} from "../logic/bagel_logic.js";
 import {PLAYER_WHEAT, removeWheat} from "../logic/player_logic.js";
 import StandardBagel from "../components/bagels/standard_bagel.js";
 import GeneratorBagel from "../components/bagels/generator_bagel.js";
@@ -21,7 +21,7 @@ export const initBuyMenu = (scene, camera, canvas) => {
     const highlightPlacementOptions = () => {
         ground.forEach((platform) => {
             platform.material.previousLineColor = platform.material.lineColor;
-            platform.material.lineColor = new Color3(0, 0.2, 1);
+            platform.material.lineColor = new Color3(0, 0, 1);
         });
     }
 
@@ -37,23 +37,9 @@ export const initBuyMenu = (scene, camera, canvas) => {
 
             // Spawn Bagel
             removeWheat(selectedMesh.metadata.cost);
-            let newBagel = null
-            switch (selectedMesh.metadata.name) {
-                case "standard":
-                    newBagel = new StandardBagel();
-                    newBagel.init(scene, newBagelPlacement.x, newBagelPlacement.z, newBagelPlacement.y + 1);
-                    addBagel(newBagel)
-                    break;
-                case "generator":
-                    newBagel = new GeneratorBagel();
-                    newBagel.init(scene, newBagelPlacement.x, newBagelPlacement.z, newBagelPlacement.y + 1);
-                    addBagel(newBagel)
-                default:
-                    newBagel = new StandardBagel();
-                    newBagel.init(scene, newBagelPlacement.x, newBagelPlacement.z, newBagelPlacement.y + 1);
-                    addBagel(newBagel)
-                    break;
-            }
+            let newBagel = createBagel(scene, selectedMesh.metadata.name,
+                newBagelPlacement.x, newBagelPlacement.z, newBagelPlacement.y + 1);
+            addBagel(newBagel)
 
             // Reset
             selectedMesh.renderOutline = false;
@@ -71,17 +57,7 @@ export const initBuyMenu = (scene, camera, canvas) => {
     const createBuyOptions = () => {
         const createInScene = (x, y, z, bagel) => {
             let createdBagel = null;
-            switch (bagel.name) {
-                case "standard":
-                    createdBagel = new StandardBagel(true);
-                    break;
-                case "generator":
-                    createdBagel = new GeneratorBagel(true);
-                    break;
-                default:
-                    createdBagel = new StandardBagel(true);
-                    break;
-            }
+            createdBagel = createBagel(scene, bagel.name, x, y, z, true);
 
             //region Create Entity
             createdBagel.init(scene, x, y, z);
@@ -151,7 +127,7 @@ export const initBuyMenu = (scene, camera, canvas) => {
 
         const generatedMeshes = [];
         availableBagels.forEach((bagel, index) => {
-            generatedMeshes.push(createInScene(3 + (index), -7 + (index), 2, bagel));
+            generatedMeshes.push(createInScene(4 + (index), -6 + (index), 3, bagel));
         });
 
         return generatedMeshes;

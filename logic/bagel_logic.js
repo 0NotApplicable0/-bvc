@@ -1,24 +1,35 @@
 import StandardBagel from "../components/bagels/standard_bagel.js";
 import GeneratorBagel from "../components/bagels/generator_bagel.js";
 
-export const availableBagels = [{
-    name: "standard",
-    cost: 1
-}, {
-    name: "sesame",
-    cost: 2
-}, {
-    name: "everything",
-    cost: 3
-}, {
-    name: "poppy",
-    cost: 4
-}, {
-    name: "generator",
-    cost: 1
-}]
+export const availableBagels = [
+    {
+        name: "standard",
+        cost: 1
+    },
+    {
+        name: "generator",
+        cost: 1
+    }
+]
 
-export let bagels = [];
+export const createBagel = (scene, name, x, y, z, isDisabled) => {
+    switch (name) {
+        case "standard":
+            let standardBagel = new StandardBagel(isDisabled);
+            standardBagel.init(scene, x, y, z);
+            return standardBagel;
+        case "generator":
+            let generatorBagel = new GeneratorBagel(isDisabled);
+            generatorBagel.init(scene, x, y, z);
+            return generatorBagel;
+        default:
+            let defaultBagel = new StandardBagel(isDisabled);
+            defaultBagel.init(scene, x, y, z);
+            return defaultBagel;
+    }
+}
+
+export let bagels = null;
 
 //region Functions
 export const addBagel = (bagel) => {
@@ -26,13 +37,14 @@ export const addBagel = (bagel) => {
 }
 
 export const removeBagel = (bagel) => {
-    let index = bagels.findIndex((bagel) => bagel.id === bagel.id);
-    bagels.splice(index, 1);
+    bagels.splice(bagels.indexOf(bagel), 1);
 }
 //endregion
 
 //region Lifecycle
 export const initBagelLogic = (scene) => {
+    bagels = [];
+
     let test_standard_bagel1 = new StandardBagel();
     test_standard_bagel1.init(scene, -2, -2, 2);
     bagels.push(test_standard_bagel1);
@@ -52,6 +64,10 @@ export const initBagelLogic = (scene) => {
     let test_standard_bagel5 = new StandardBagel();
     test_standard_bagel5.init(scene, 2, -2, 2);
     bagels.push(test_standard_bagel5);
+
+    // let test_standard_bagel6 = new GeneratorBagel();
+    // test_standard_bagel6.init(scene, 2, -1, 2);
+    // bagels.push(test_standard_bagel6);
 }
 
 export const bagelLogicTick = (scene) => {
@@ -64,5 +80,7 @@ export const bagelLogicCleanup = (scene) => {
     bagels.forEach((bagel) => {
         bagel.cleanup(scene);
     });
+
+    bagels = null;
 }
 //endregion

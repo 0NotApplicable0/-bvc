@@ -1,15 +1,12 @@
 import Bagel from "./bagel.js";
-import {ActionManager, Color3, ExecuteCodeAction, Mesh, MeshBuilder, ParticleHelper, Sprite, SpriteManager, Tags} from "@babylonjs/core";
-import {createBox} from "../../utils/debug.js";
+import {ActionManager, ExecuteCodeAction, ParticleHelper} from "@babylonjs/core";
 import image from "../../assets/bagel.png";
-import {AdvancedDynamicTexture, Rectangle} from "@babylonjs/gui";
 import {addWheat} from "../../logic/player_logic.js";
 
 const name = "generator";
-const health = 100;
+const health = 10000;
 const damage = 0;
 const cost = 1;
-const color = new Color3(0, 0, 0);
 
 export default class GeneratorBagel extends Bagel {
     constructor(isDisabled = false) {
@@ -52,31 +49,19 @@ export default class GeneratorBagel extends Bagel {
     //region Lifecycle
     init(scene, x, y, z) {
         if (this.initialized) {
-            console.log("Bagel already initialized: ", this.name, this.id);
+            console.log("Generator Bagel already initialized: ", this.name, this.id);
             return;
         }
-        super.init(scene);
 
-        // Create Sprite
-        const spriteManager = new SpriteManager(
-            "generator_bagel_sprite_manager",
-            image,
-            1,
-            50,
-            scene
-        )
-        const sprite = new Sprite("generator_bagel_sprite", spriteManager);
-
-        sprite.position.x = x;
-        sprite.position.z = y;
-        sprite.position.y = z;
-
-        // Create invisible mesh for raycasting
-        let mesh = createBox(scene, x, y, z, color, this.name, 0);
+        super.init(scene, "generator", x, y, z, {
+            image: image,
+            capacity: 1,
+            cellSize: 50,
+        });
 
         if (!this.isDisabled) {
-            mesh.actionManager = new ActionManager(scene);
-            mesh.actionManager.registerAction(
+            this.mesh.actionManager = new ActionManager(scene);
+            this.mesh.actionManager.registerAction(
                 new ExecuteCodeAction(
                     ActionManager.OnPickTrigger,
                     (evt) => {
@@ -91,38 +76,7 @@ export default class GeneratorBagel extends Bagel {
                     }
                 )
             );
-
-            mesh.id = this.id;
-            mesh.receiveShadows = true;
-            mesh.checkCollisions = true;
-            mesh.isPickable = true;
-
-            // Create Health Bar
-            // Create Bagel Health Bar Mesh //
-            let guiPlane = MeshBuilder.CreatePlane("health_plane_" + this.id, {size: 1}, scene);
-            guiPlane.parent = mesh;
-            guiPlane.position.y = 1;
-            guiPlane.billboardMode = Mesh.BILLBOARDMODE_ALL;
-
-            let gui = AdvancedDynamicTexture.CreateForMesh(guiPlane, 200, 100);
-            let healthBar = new Rectangle();
-            healthBar.width = (this.health / 100 / 2);
-            healthBar.height = "10px";
-            healthBar.color = "black";
-            healthBar.background = "red";
-            healthBar.thickness = 1;
-            gui.addControl(healthBar);
-
-            Tags.EnableFor(mesh);
-            Tags.AddTagsTo(mesh, "bagel");
-
-            this.healthBarMesh = healthBar;
         }
-
-        // Add Bagel to State
-        this.sprite = sprite;
-        this.mesh = mesh;
-        this.initialized = true;
     }
 
     update(scene) {

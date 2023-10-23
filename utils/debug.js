@@ -1,8 +1,13 @@
-import {Color3, GizmoManager, KeyboardEventTypes, MeshBuilder, PointerEventTypes, Vector3} from "@babylonjs/core";
+import {Color3, GizmoManager, KeyboardEventTypes, MeshBuilder, SceneLoader, Texture, Vector3} from "@babylonjs/core";
 import {GridMaterial} from "@babylonjs/materials";
-import {bagels} from "../BagelsVersusCats.jsx";
 import {Inspector} from "@babylonjs/inspector";
-import {spawnCat} from "../logic/cat_logic.js";
+import '@babylonjs/loaders';
+
+import bagelStallTexture from "../assets/textures/stall_baseColor.png";
+import bagelGroundTexture from "../assets/textures/gound_baseColor.png";
+import bagelStand from "../assets/background.glb";
+// import bagelStand from "../assets/scene.gltf";
+// import bagelStand from "../assets/bread_stall.fbx";
 
 //region Helper functions
 export const createBox = (scene, x, y, z, color, name, opacity) => {
@@ -11,7 +16,7 @@ export const createBox = (scene, x, y, z, color, name, opacity) => {
     box.position.z = y;
     box.position.y = z;
 
-    let material = new GridMaterial("bagel_material", scene);
+    let material = new GridMaterial(name + "_material", scene);
     material.lineColor = new Color3(0.2, 0.2, 0.2);
     material.minorUnitVisibility = 0;
     material.gridOffset = new Vector3(0.5, 0.5, 0.5);
@@ -27,39 +32,51 @@ export const createBox = (scene, x, y, z, color, name, opacity) => {
 export const createPlatform = (scene) => {
     let ground = []
 
+    let material = new GridMaterial("ground_material", scene);
+    material.lineColor = new Color3(0, 1, 0);
+    material.minorUnitVisibility = 0;
+    material.gridOffset = new Vector3(0.5, 0.5, 0.5);
+    material.majorUnitFrequency = 0.5;
+    material.opacity = 0.99;
+    material.mainColor = new Color3(0.49, 0.8, 0.05);
+    material.diffuseColor = new Color3(0.49, 0.8, 0.05);
+
     for (let x = -2; x < 3; x++) {
         for (let y = -2; y < 3; y++) {
-            for (let z = 0; z < 2; z++) {
+            for (let z = 1; z < 2; z++) {
                 let box = MeshBuilder.CreateBox("box", {size: 1}, scene);
                 box.position.x = x;
                 box.position.z = y;
                 box.position.y = z;
 
-                // box.enableEdgesRendering();
-                // box.edgesColor = new Color4(0, 0, 0, 1);
-                // box.edgesWidth = 3;
-
-                let material = new GridMaterial("myMaterial", scene);
-                material.lineColor = new Color3(0.2, 0.2, 0.2);
-                material.minorUnitVisibility = 0;
-                material.gridOffset = new Vector3(0.5, 0.5, 0.5);
-                material.majorUnitFrequency = 0.5;
-
-                if (z == 1) {
-                    material.mainColor = new Color3(0.49, 0.8, 0.05);
-                    material.diffuseColor = new Color3(0.49, 0.8, 0.05);
-                    if (y !== 2) ground.push(box);
-                } else {
-                    material.mainColor = new Color3(0.667, 0.4, 0.168);
-                    material.diffuseColor = new Color3(0.667, 0.4, 0.168);
-                }
-                // material.ambientColor = new Color3(0.0, 0.0, 0.0);
-                // material.specularColor = new Color3(0,0,0);
-
+                if (y !== 2) ground.push(box);
                 box.material = material;
             }
         }
     }
+
+    SceneLoader.ImportMesh(
+        '',
+        bagelStand,
+        '',
+        scene,
+        function (meshes) {
+            let root = meshes[0];
+            root.scaling = new Vector3(20, 20, 20);
+            root.position = new Vector3(0, -18.5, 0);
+
+            let stall_ground = meshes[0].getChildMeshes()[1];
+            let stall = meshes[0].getChildMeshes()[0];
+
+            const stallTex = new Texture(bagelStallTexture);
+            const groundTex = new Texture(bagelGroundTexture);
+
+            stall.material.albedoTexture = stallTex
+            stall_ground.material.albedoTexture = groundTex
+        }
+    );
+
+    scene.createDefaultEnvironment({createGround:false, createSkybox:false})
 
     return ground;
 }

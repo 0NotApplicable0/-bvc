@@ -3,6 +3,12 @@ import {PLAYER_WHEAT} from "./player_logic.js";
 
 export let fullscreen_ui = null;
 
+//region Functions
+export const addToUi = (control) => {
+    fullscreen_ui.addControl(control);
+}
+//endregion
+
 //region Lifecycle
 export const initUiLogic = (scene) => {
     fullscreen_ui = AdvancedDynamicTexture.CreateFullscreenUI("myUI");

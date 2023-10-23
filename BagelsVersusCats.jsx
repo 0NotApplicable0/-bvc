@@ -5,11 +5,11 @@ import "./styles.css";
 import {Debug} from "@babylonjs/core/Legacy/legacy.js";
 import {SceneManager} from "./containers/SceneManager.jsx";
 import {bagelLogicCleanup, bagelLogicTick, initBagelLogic} from "./logic/bagel_logic.js";
-import {catLogicTick, initCatLogic} from "./logic/cat_logic.js";
-import {initStateLogic, stateLogicCleanup, stateLogicTick} from "./logic/state_logic.js";
+import {catLogicCleanup, catLogicTick, initCatLogic} from "./logic/cat_logic.js";
+import {GAME_STATES, initStateLogic, setGameState, stateLogicCleanup, stateLogicTick} from "./logic/state_logic.js";
 import HavokPhysics from "@babylonjs/havok";
 import {initBuyMenu} from "./containers/buy_menu.js";
-import {catSpawnerTick, initCatSpawner} from "./containers/cat_spawner.js";
+import {catSpawnerCleanup, catSpawnerTick, initCatSpawner} from "./containers/cat_spawner.js";
 import {initPlayerLogic} from "./logic/player_logic.js";
 import {initUiLogic, uiLogicTick} from "./logic/ui_logic.js";
 import {useEffect} from "react";
@@ -37,6 +37,8 @@ export default function BagelsVersusCats() {
      * Will run when the scene is ready
      */
     const onSceneReady = (scene) => {
+        setGameState(GAME_STATES.IN_GAME);
+
         // SCENE GENERATION //
         scene.clearColor = new Color4(1, 1, 1, 1);
         const canvas = scene.getEngine().getRenderingCanvas();
@@ -44,14 +46,14 @@ export default function BagelsVersusCats() {
         ground = createPlatform(scene);
 
         // COMPONENT SETUP //
-        initBuyMenu(scene, camera, canvas);
+        initBagelLogic(scene);
+        initCatLogic(scene);
+        // initBuyMenu(scene, camera, canvas);
         initCatSpawner(scene);
         initDebugUtilities(scene);
         initPlayerLogic(scene);
         initUiLogic(scene);
         initStateLogic(scene);
-        initBagelLogic(scene);
-        initCatLogic(scene);
     }
 
     /**
@@ -68,8 +70,11 @@ export default function BagelsVersusCats() {
 
     useEffect(() => {
         return () => {
+            console.log("Cleaning up...");
             stateLogicCleanup();
             bagelLogicCleanup();
+            catLogicCleanup();
+            catSpawnerCleanup();
         }
     }, []);
 
