@@ -6,3 +6,14 @@
 # Installation
 This repository just contains the component template for the BVC game. To use this component either
 drop it into an existing React app or use [CRA](https://create-react-app.dev/) to create a new one.
+
+## Packages To Add:
+
+- "@babylonjs/core"
+- "@babylonjs/gui"
+- "@babylonjs/gui-editor"
+- "@babylonjs/havok"
+- "@babylonjs/inspector"
+- "@babylonjs/loaders"
+- "@babylonjs/materials"
+- "@babylonjs/serializers"
