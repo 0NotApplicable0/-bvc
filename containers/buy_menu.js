@@ -2,14 +2,10 @@ import {ActionManager, Color3, ExecuteCodeAction, Mesh, MeshBuilder, PointerEven
 import {ground} from "../BagelsVersusCats.jsx";
 import {GridMaterial} from "@babylonjs/materials";
 import {AdvancedDynamicTexture, TextBlock} from "@babylonjs/gui";
-import {addBagel, availableBagels, createBagel, getCorrespondingBagel} from "../logic/bagel_logic.js";
+import {addBagel, availableBagels, createBagel} from "../logic/bagel_logic.js";
 import {PLAYER_WHEAT, removeWheat} from "../logic/player_logic.js";
-import StandardBagel from "../components/bagels/standard_bagel.js";
-import GeneratorBagel from "../components/bagels/generator_bagel.js";
 
 export const initBuyMenu = (scene, camera, canvas) => {
-    let bagels = null;
-
     let selectedMesh = null;
     let material = new GridMaterial("outlined", scene);
     material.lineColor = new Color3(0, 1, 0);
@@ -26,6 +22,8 @@ export const initBuyMenu = (scene, camera, canvas) => {
     }
 
     const unhighlightPlacementOptions = () => {
+        console.log("Unhighlighting: ", ground);
+
         ground.forEach((platform) => {
             platform.material.lineColor = platform.material.previousLineColor;
         });
@@ -127,14 +125,14 @@ export const initBuyMenu = (scene, camera, canvas) => {
 
         const generatedMeshes = [];
         availableBagels.forEach((bagel, index) => {
-            generatedMeshes.push(createInScene(4 + (index), -6 + (index), 3, bagel));
+            generatedMeshes.push(createInScene(5 + (index), -5 + (index), 3, bagel));
         });
 
         return generatedMeshes;
     }
     //endregion
 
-    bagels = createBuyOptions();
+    createBuyOptions();
     scene.onPointerObservable.add((pointerInfo) => {
         switch (pointerInfo.type) {
             case PointerEventTypes.POINTERDOWN:

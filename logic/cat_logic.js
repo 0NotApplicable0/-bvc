@@ -18,9 +18,9 @@ export const removeCat = (cat) => {
 //region Lifecycle
 export const initCatLogic = (scene) => {
     cats = [];
-    let testcat1 = new StandardCat();
-    testcat1.init(scene, -2, 2, 2);
-    cats.push(testcat1);
+    // let testcat1 = new StandardCat();
+    // testcat1.init(scene, -2, 2, 2);
+    // cats.push(testcat1);
 }
 
 export const catLogicTick = (scene) => {

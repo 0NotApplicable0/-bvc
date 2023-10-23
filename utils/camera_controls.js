@@ -6,7 +6,7 @@ export const cameraSetup = (scene, canvas) => {
         Math.PI / 4,
         Math.PI / 4,
         3 * 10,
-        new Vector3(0, 1, 0),
+        new Vector3(-1, -1.5, 0),
         scene
     );
     camera.mode = Camera.ORTHOGRAPHIC_CAMERA;

@@ -4,22 +4,24 @@ import {cats} from "../logic/cat_logic.js";
 import StandardCat from "../components/cats/standard_cat.js";
 
 let spawnerId = null;
+
 export const initCatSpawner = (scene) => {
-    let spawnRow = {y: 2, z: 2};
+    let spawnRow = {y: 7, z: 2};
 
     const createCat = (retryCount) => {
         if(retryCount > 5) return;
 
         // Generate a random x value between -2 and 2 for the cat to spawn at
-        let x = randomIntFromInterval(-2, 2);
+        let x = randomIntFromInterval(-2, 4);
 
         // Check if there is already a cat at that x value
         let catAlreadyExists = cats.find((cat) => {
             let foundCat = scene.getMeshById(cat.id);
             if(foundCat === null) return false;
+
             return foundCat.position.x === x
-                && foundCat.position.y === spawnRow.y
-                && Math.ceil(foundCat.position.z) === 2;
+                && foundCat.position.y === spawnRow.z
+                && Math.ceil(foundCat.position.z) === spawnRow.y;
         });
 
         if (!catAlreadyExists){
@@ -34,7 +36,7 @@ export const initCatSpawner = (scene) => {
     // Every 5 seconds, spawn a cat
     spawnerId = setInterval(() => {
         createCat(0);
-    }, 1000);
+    }, 2000);
 }
 
 export const catSpawnerTick = (scene) => {

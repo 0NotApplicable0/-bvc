@@ -42,7 +42,7 @@ export default class StandardBagel extends Bagel {
                 projectile.dispose();
                 this.localIntervals.splice(this.localIntervals.indexOf(projectileLoop), 1);
                 clearInterval(projectileLoop);
-            } else if (projectile.position.z + 0.01 > 2) {
+            } else if (projectile.position.z + 0.01 > 8) {
                 projectile.material.dispose();
                 projectile.dispose();
                 this.localIntervals.splice(this.localIntervals.indexOf(projectileLoop), 1);
@@ -57,7 +57,7 @@ export default class StandardBagel extends Bagel {
     timedFireProjectile(scene) {
         let timeNow = Date.now();
         let timePassed = (timeNow - this.timeSync) / 1000;
-        if (timePassed >= 1) {
+        if (timePassed >= 3) {
             this.timeSync = timeNow;
             this.fireProjectile(scene);
         }
@@ -80,8 +80,8 @@ export default class StandardBagel extends Bagel {
 
         this.sprite.width = 0.7;
         this.sprite.height = 0.7;
-        this.mesh.scaling = new Vector3(0.8, 0.8, 0.8);
-        this.toggleDebugEdges();
+        // this.mesh.scaling = new Vector3(0.8, 0.8, 0.8);
+        // this.toggleDebugEdges();
     }
 
     update(scene) {

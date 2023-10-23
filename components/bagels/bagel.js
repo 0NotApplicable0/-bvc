@@ -29,6 +29,7 @@ export default class Bagel extends Entity {
             healthBar.color = "black";
             healthBar.background = "red";
             healthBar.thickness = 1;
+            healthBar.top = "20px";
             gui.addControl(healthBar);
 
             Tags.EnableFor(this.mesh);

@@ -1,4 +1,4 @@
-import {Color4, HavokPlugin, Mesh, Vector3} from "@babylonjs/core";
+import {Color4, Mesh} from "@babylonjs/core";
 import {cameraSetup} from "./utils/camera_controls.js";
 import {createPlatform, debugUtilitiesTick, initDebugUtilities} from "./utils/debug.js";
 import "./styles.css";
@@ -7,12 +7,11 @@ import {SceneManager} from "./containers/SceneManager.jsx";
 import {bagelLogicCleanup, bagelLogicTick, initBagelLogic} from "./logic/bagel_logic.js";
 import {catLogicCleanup, catLogicTick, initCatLogic} from "./logic/cat_logic.js";
 import {GAME_STATES, initStateLogic, setGameState, stateLogicCleanup, stateLogicTick} from "./logic/state_logic.js";
-import HavokPhysics from "@babylonjs/havok";
-import {initBuyMenu} from "./containers/buy_menu.js";
 import {catSpawnerCleanup, catSpawnerTick, initCatSpawner} from "./containers/cat_spawner.js";
 import {initPlayerLogic} from "./logic/player_logic.js";
 import {initUiLogic, uiLogicTick} from "./logic/ui_logic.js";
 import {useEffect} from "react";
+import {initBuyMenu} from "./containers/buy_menu.js";
 
 //region PROTOTYPES
 Mesh.prototype.showLocalAxis = function () {
@@ -48,7 +47,7 @@ export default function BagelsVersusCats() {
         // COMPONENT SETUP //
         initBagelLogic(scene);
         initCatLogic(scene);
-        // initBuyMenu(scene, camera, canvas);
+        initBuyMenu(scene, camera, canvas);
         initCatSpawner(scene);
         initDebugUtilities(scene);
         initPlayerLogic(scene);

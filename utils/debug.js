@@ -1,4 +1,4 @@
-import {Color3, GizmoManager, KeyboardEventTypes, MeshBuilder, SceneLoader, Texture, Vector3} from "@babylonjs/core";
+import {ActionManager, Color3, ExecuteCodeAction, GizmoManager, KeyboardEventTypes, MeshBuilder, SceneLoader, Texture, Vector3} from "@babylonjs/core";
 import {GridMaterial} from "@babylonjs/materials";
 import {Inspector} from "@babylonjs/inspector";
 import '@babylonjs/loaders';
@@ -6,6 +6,7 @@ import '@babylonjs/loaders';
 import bagelStallTexture from "../assets/textures/stall_baseColor.png";
 import bagelGroundTexture from "../assets/textures/gound_baseColor.png";
 import bagelStand from "../assets/background.glb";
+import {addWheat} from "../logic/player_logic.js";
 // import bagelStand from "../assets/scene.gltf";
 // import bagelStand from "../assets/bread_stall.fbx";
 
@@ -32,24 +33,24 @@ export const createBox = (scene, x, y, z, color, name, opacity) => {
 export const createPlatform = (scene) => {
     let ground = []
 
-    let material = new GridMaterial("ground_material", scene);
-    material.lineColor = new Color3(0, 1, 0);
-    material.minorUnitVisibility = 0;
-    material.gridOffset = new Vector3(0.5, 0.5, 0.5);
-    material.majorUnitFrequency = 0.5;
-    material.opacity = 0.99;
-    material.mainColor = new Color3(0.49, 0.8, 0.05);
-    material.diffuseColor = new Color3(0.49, 0.8, 0.05);
-
-    for (let x = -2; x < 3; x++) {
-        for (let y = -2; y < 3; y++) {
+    for (let x = -2; x < 5; x++) {
+        for (let y = -2; y < 8; y++) {
             for (let z = 1; z < 2; z++) {
                 let box = MeshBuilder.CreateBox("box", {size: 1}, scene);
                 box.position.x = x;
                 box.position.z = y;
                 box.position.y = z;
 
-                if (y !== 2) ground.push(box);
+                let material = new GridMaterial("ground_material", scene);
+                material.lineColor = new Color3(0, 1, 0);
+                material.minorUnitVisibility = 0;
+                material.gridOffset = new Vector3(0.5, 0.5, 0.5);
+                material.majorUnitFrequency = 0.5;
+                material.opacity = 0.99;
+                material.mainColor = new Color3(0.49, 0.8, 0.05);
+                material.diffuseColor = new Color3(0.49, 0.8, 0.05);
+
+                if (y !== 7) ground.push(box);
                 box.material = material;
             }
         }
