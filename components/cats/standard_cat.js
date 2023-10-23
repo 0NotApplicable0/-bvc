@@ -1,7 +1,5 @@
-import {ActionManager, Color3, ExecuteCodeAction, Mesh, MeshBuilder, Sprite, SpriteManager, Tags} from "@babylonjs/core";
-import {createBox} from "../../utils/debug.js";
-import image from "../../assets/skippy.png";
-import {AdvancedDynamicTexture, Rectangle} from "@babylonjs/gui";
+import {randomIntFromInterval} from "../../utils/debug.js";
+import skippySpriteSheet from "../../assets/skippy_spritesheet3.png";
 import Cat from "./cat.js";
 
 const name = "standard_cat";
@@ -21,12 +19,14 @@ export default class StandardCat extends Cat {
         }
 
         super.init(scene, x, y, z, {
-            image: image,
+            image: skippySpriteSheet,
             capacity: 1,
-            cellSize: 120,
+            cellSize: 108,
         });
 
-        this.toggleDebugEdges();
+        this.sprite.playAnimation(0, 3, true, randomIntFromInterval(50, 100));
+
+        // this.toggleDebugEdges();
         this.sprite.width = 1.3;
         this.sprite.height = 1.3;
     }
@@ -34,5 +34,6 @@ export default class StandardCat extends Cat {
     update(scene) {
         super.update(scene);
     }
+
     //endregion
 }
