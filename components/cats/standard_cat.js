@@ -1,12 +1,12 @@
 import {randomIntFromInterval} from "../../utils/debug.js";
 import skippySpriteSheet from "../../assets/skippy_spritesheet3.png";
-import Cat from "./cat.js";
+import __cat__ from "./__cat__.js";
 
 const name = "standard_cat";
 const health = 100;
 const damage = 35;
 
-export default class StandardCat extends Cat {
+export default class StandardCat extends __cat__ {
     constructor() {
         super(name, health, damage);
     }
@@ -14,7 +14,7 @@ export default class StandardCat extends Cat {
     //region Lifecycle
     init(scene, x, y, z) {
         if (this.initialized) {
-            console.log("Cat already initialized: ", this.name, this.id);
+            console.log("__cat__ already initialized: ", this.name, this.id);
             return;
         }
 

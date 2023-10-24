@@ -1,57 +1,37 @@
-import Bagel from "./bagel.js";
+import __bagel__ from "./__bagel__.js";
 import {Color3, Ray, Vector3} from "@babylonjs/core";
 import {createBox} from "../../utils/debug.js";
 import image from "../../assets/bagelv3.png";
 import {cats} from "../../logic/cat_logic.js";
+import bagelShotImage from "../../assets/bagel_shot.png";
+import Projectile from "../projectile.js";
 
 const name = "standard_bagel";
 const health = 100;
 const damage = 50;
 const cost = 1;
 
-export default class StandardBagel extends Bagel {
+export default class StandardBagel extends __bagel__ {
     constructor(isDisabled = false) {
         super(name, health, damage, cost);
         this.timeSync = Date.now();
         this.isDisabled = isDisabled;
+        this.projectiles = [];
     }
 
     //region Functions
     fireProjectile(scene) {
-        let projectile = createBox(scene, this.mesh.position.x - 0.05, this.mesh.position.z, this.mesh.position.y + 0.05, new Color3(0, 0, 1), "projectile");
-        projectile.scaling = new Vector3(0.1, 0.1, 0.1);
-
-        // Projectile Loop //
-        let projectileLoop = setInterval(() => {
-            // Ray Look Ahead //
-            let origin = new Vector3(projectile.position.x, projectile.position.y, projectile.position.z + 0.11);
-            let forward = new Vector3(0, 0, 1);
-            let length = 0.05;
-            let ray = new Ray(origin, forward, length);
-
-            // let rayHelper = new RayHelper(ray);
-            // rayHelper.show(scene, new Color3(1, 0, 0));
-
-            // Hit Detection //
-            let hit = scene.pickWithRay(ray);
-            if (hit.pickedMesh && hit.pickedMesh.matchesTagsQuery !== undefined && hit.pickedMesh.matchesTagsQuery("cat")) {
-                let foundCat = cats.find((cat) => cat.id === hit.pickedMesh.id);
-                if(foundCat === undefined) return;
-                foundCat.health -= this.damage;
-                projectile.material.dispose();
-                projectile.dispose();
-                this.localIntervals.splice(this.localIntervals.indexOf(projectileLoop), 1);
-                clearInterval(projectileLoop);
-            } else if (projectile.position.z + 0.01 > 8) {
-                projectile.material.dispose();
-                projectile.dispose();
-                this.localIntervals.splice(this.localIntervals.indexOf(projectileLoop), 1);
-                clearInterval(projectileLoop);
-            } else {
-                projectile.position.z += 0.01;
-            }
-        }, 10);
-        this.localIntervals.push(projectileLoop);
+        let projectile = new Projectile(0.02, 25);
+        let projectileSpriteOptions = {
+            image: bagelShotImage,
+            capacity: 1,
+            cellSize: 12,
+        }
+        projectile.init(scene, this.mesh.position.x - 0.05, this.mesh.position.z, this.mesh.position.y + 0.05, projectileSpriteOptions);
+        projectile.mesh.scaling = new Vector3(0.1, 0.1, 0.1);
+        projectile.sprite.width = 0.2;
+        projectile.sprite.height = 0.2;
+        this.projectiles.push(projectile);
     }
 
     timedFireProjectile(scene) {
@@ -68,7 +48,7 @@ export default class StandardBagel extends Bagel {
     //region Lifecycle
     init(scene, x, y, z) {
         if (this.initialized) {
-            console.log("Standard Bagel already initialized: ", this.name, this.id);
+            console.log("Standard __bagel__ already initialized: ", this.name, this.id);
             return;
         }
 
@@ -78,8 +58,8 @@ export default class StandardBagel extends Bagel {
             cellSize: 60,
         });
 
-        this.sprite.width = 0.7;
-        this.sprite.height = 0.7;
+        // this.sprite.width = 0.7;
+        // this.sprite.height = 0.7;
         // this.mesh.scaling = new Vector3(0.8, 0.8, 0.8);
         // this.toggleDebugEdges();
     }
@@ -87,12 +67,17 @@ export default class StandardBagel extends Bagel {
     update(scene) {
         super.update(scene);
 
-        // Cat In Row Detection //
+        // __cat__ In Row Detection //
         let currentY = this.mesh.position.y;
         let currentX = this.mesh.position.x;
         if (cats.find((cat) => cat.mesh.position.y === currentY && cat.mesh.position.x === currentX)) {
             this.timedFireProjectile(scene);
         }
+
+        // Simulate Projectiles //
+        this.projectiles.forEach((projectile) => {
+            projectile.update(scene);
+        });
     }
 
     //endregion

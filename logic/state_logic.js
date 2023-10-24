@@ -1,8 +1,9 @@
 import {Rectangle, TextBlock} from "@babylonjs/gui";
 import {createBox, randomIntFromInterval} from "../utils/debug.js";
-import {ActionManager, Color3, ExecuteCodeAction, Vector3} from "@babylonjs/core";
+import {ActionManager, Color3, ExecuteCodeAction, KeyboardEventTypes, Vector3} from "@babylonjs/core";
 import {addWheat, PLAYER_WHEAT} from "./player_logic.js";
 import {addToUi, fullscreen_ui} from "./ui_logic.js";
+import {Inspector} from "@babylonjs/inspector";
 
 // Used for react component cleanup, not related to the game //
 let localIntervals = [];
@@ -28,6 +29,22 @@ export let HAS_WHEAT_DROP_STARTED = false;
 //region Game State Functions
 export const setGameState = (newGameState) => {
     CURRENT_GAME_STATE = newGameState;
+}
+
+export const pauseGame = () => {
+    CURRENT_GAME_STATE = GAME_STATES.PAUSED;
+    let gamePaused = new TextBlock();
+    gamePaused.name = "GamePaused";
+    gamePaused.text = "GAME PAUSED";
+    gamePaused.color = "#1A202C";
+    gamePaused.fontFamily = "JetBrains Mono";
+    gamePaused.fontSize = 32;
+    fullscreen_ui.addControl(gamePaused);
+}
+
+export const unpauseGame = () => {
+    CURRENT_GAME_STATE = GAME_STATES.IN_GAME;
+    fullscreen_ui.getControlByName("GamePaused").dispose();
 }
 
 export const collectWheat = (wheat) => {
@@ -90,6 +107,22 @@ export const initStateLogic = (scene) => {
     waveProgress.thickness = 1;
     waveProgress.top = "50%";
     addToUi(waveProgress);
+
+    scene.onKeyboardObservable.add((kbInfo) => {
+        switch (kbInfo.type) {
+            case KeyboardEventTypes.KEYDOWN:
+                if(kbInfo.event.code === "Space") {
+                    if (CURRENT_GAME_STATE === GAME_STATES.IN_GAME) {
+                        pauseGame();
+                        console.log("Pausing Game...");
+                    } else if (CURRENT_GAME_STATE === GAME_STATES.PAUSED) {
+                        unpauseGame();
+                        console.log("Resuming Game...");
+                    }
+                }
+                break;
+        }
+    });
 }
 
 export const stateLogicTick = (scene) => {

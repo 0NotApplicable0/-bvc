@@ -7,7 +7,7 @@ import {createBox} from "../../utils/debug.js";
 import {AdvancedDynamicTexture, Rectangle} from "@babylonjs/gui";
 import Entity from "../entity.js";
 
-export default class Cat extends Entity{
+export default class __cat__ extends Entity{
     constructor(name, health, damage) {
         super(name);
         this.health = health;
@@ -25,8 +25,10 @@ export default class Cat extends Entity{
     init(scene, x, y, z, spriteManagerOptions) {
         super.init(scene, x, y, z, spriteManagerOptions);
 
+        this.toggleDebugEdges();
+
         // Create Health Bar
-        // Create Cat Health Bar Mesh //
+        // Create __cat__ Health Bar Mesh //
         let guiPlane = MeshBuilder.CreatePlane("health_plane_" + this.name + "_cat_" + this.id, {size: 1}, scene);
         guiPlane.parent = this.mesh;
         guiPlane.position.y = 1;
@@ -52,13 +54,13 @@ export default class Cat extends Entity{
     update(scene) {
         super.update(scene);
 
-        // Cat Death Check //
+        // __cat__ Death Check //
         if (this.health <= 0) {
             this.cleanup();
             return;
         }
 
-        // Cat Health Bar Update //
+        // __cat__ Health Bar Update //
         this.healthBarMesh.width = (this.health / 100 / 2);
 
         // Look Ahead //
@@ -73,7 +75,7 @@ export default class Cat extends Entity{
         let hit = scene.pickWithRay(ray);
         if (hit.pickedMesh && hit.pickedMesh.matchesTagsQuery !== undefined && hit.pickedMesh.matchesTagsQuery("bagel")) {
             let foundBagel = bagels.find((bagel) => bagel.id === hit.pickedMesh.id);
-            foundBagel.health -= 1;
+            foundBagel.health -= 0.5;
         } else if (this.mesh.position.z - 1 / 200 < -2) {
             setGameState(GAME_STATES.GAME_OVER);
         } else {

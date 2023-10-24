@@ -7,6 +7,7 @@ export default class Entity {
         this.id = crypto.randomUUID();
         this.initialized = false;
         this.localIntervals = []; // Add all intervals to this array to be cleared on cleanup
+        this.cleanedUp = false;
     }
 
     //region Functions
@@ -31,6 +32,15 @@ export default class Entity {
 
     //region Lifecycle
     init(scene, x, y, z, spriteManagerOptions) {
+        if(this.initialized) {
+            console.log("Entity already initialized: ", this.name, this.id);
+            return;
+        }
+        if(this.cleanedUp) {
+            console.log("Entity already cleaned up: ", this.name, this.id);
+            return;
+        }
+
         // Create Sprite //
         const spriteManager = new SpriteManager(
             this.name + "_sprite_manager",
@@ -49,7 +59,7 @@ export default class Entity {
         let mesh = createBox(scene, x, y, z, new Color3(0, 0, 0), this.name, 0);
         mesh.id = this.id;
 
-        // Add Bagel to State
+        // Add __bagel__ to State
         this.sprite = sprite;
         this.spriteManager = spriteManager;
         this.mesh = mesh;
@@ -60,6 +70,7 @@ export default class Entity {
     }
 
     cleanup() {
+        this.cleanedUp = true;
         this.mesh.dispose(false, true);
         this.sprite.dispose();
         this.spriteManager.dispose();

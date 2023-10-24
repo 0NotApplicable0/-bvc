@@ -1,14 +1,14 @@
-import Bagel from "./bagel.js";
+import __bagel__ from "./__bagel__.js";
 import {ActionManager, ExecuteCodeAction, ParticleHelper} from "@babylonjs/core";
-import image from "../../assets/bagel.png";
+import image from "../../assets/wheat_bagel.png";
 import {addWheat} from "../../logic/player_logic.js";
 
-const name = "generator";
+const name = "wheat";
 const health = 10000;
 const damage = 0;
 const cost = 1;
 
-export default class GeneratorBagel extends Bagel {
+export default class WheatBagel extends __bagel__ {
     constructor(isDisabled = false) {
         super(name, health, damage, cost);
         this.timeSync = Date.now();
@@ -49,11 +49,11 @@ export default class GeneratorBagel extends Bagel {
     //region Lifecycle
     init(scene, x, y, z) {
         if (this.initialized) {
-            console.log("Generator Bagel already initialized: ", this.name, this.id);
+            console.log("Wheat __bagel__ already initialized: ", this.name, this.id);
             return;
         }
 
-        super.init(scene, "generator", x, y, z, {
+        super.init(scene, "wheat", x, y, z, {
             image: image,
             capacity: 1,
             cellSize: 50,
@@ -65,7 +65,7 @@ export default class GeneratorBagel extends Bagel {
                 new ExecuteCodeAction(
                     ActionManager.OnPickTrigger,
                     (evt) => {
-                        console.log("Generator Bagel Picked: ", this);
+                        console.log("Generator __bagel__ Picked: ", this);
                         if (this.readyToHarvest) {
                             addWheat(1);
                             this.readyToHarvest = false;

@@ -3,7 +3,7 @@ import {Mesh, MeshBuilder, Tags} from "@babylonjs/core";
 import {AdvancedDynamicTexture, Rectangle} from "@babylonjs/gui";
 import Entity from "../entity.js";
 
-export default class Bagel extends Entity {
+export default class __bagel__ extends Entity {
     constructor(name, health, damage, cost) {
         super(name);
         this.health = health;
@@ -14,6 +14,10 @@ export default class Bagel extends Entity {
     //region Lifecycle
     init(scene, name, x, y, z, spriteManagerOptions) {
         super.init(scene, x, y, z, spriteManagerOptions);
+
+        this.sprite.width = 0.7;
+        this.sprite.height = 0.7;
+        this.toggleDebugEdges();
 
         if (!this.isDisabled) {
             // Create Health Bar //
@@ -44,13 +48,13 @@ export default class Bagel extends Entity {
     update(scene) {
         super.update(scene);
 
-        // Bagel Death Check //
+        // __bagel__ Death Check //
         if (this.health <= 0) {
             this.cleanup();
             return
         }
 
-        // Bagel Health Bar Update //
+        // __bagel__ Health Bar Update //
         this.healthBarMesh.width = (this.health / 100 / 2);
     }
 

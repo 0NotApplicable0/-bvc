@@ -33,7 +33,7 @@ export const initBuyMenu = (scene, camera, canvas) => {
         if (selectedMesh !== null && pointerInfo.pickInfo.hit && ground.includes(pointerInfo.pickInfo.pickedMesh)) {
             let newBagelPlacement = ground.find((platform) => platform === pointerInfo.pickInfo.pickedMesh).position;
 
-            // Spawn Bagel
+            // Spawn __bagel__
             removeWheat(selectedMesh.metadata.cost);
             let newBagel = createBagel(scene, selectedMesh.metadata.name,
                 newBagelPlacement.x, newBagelPlacement.z, newBagelPlacement.y + 1);

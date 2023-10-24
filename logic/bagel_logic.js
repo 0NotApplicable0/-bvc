@@ -1,5 +1,6 @@
 import StandardBagel from "../components/bagels/standard_bagel.js";
-import GeneratorBagel from "../components/bagels/generator_bagel.js";
+import wheatBagel from "../components/bagels/wheat_bagel.js";
+import WheatBagel from "../components/bagels/wheat_bagel.js";
 
 export const availableBagels = [
     {
@@ -7,7 +8,7 @@ export const availableBagels = [
         cost: 1
     },
     {
-        name: "generator",
+        name: "wheat",
         cost: 1
     }
 ]
@@ -18,10 +19,10 @@ export const createBagel = (scene, name, x, y, z, isDisabled) => {
             let standardBagel = new StandardBagel(isDisabled);
             standardBagel.init(scene, x, y, z);
             return standardBagel;
-        case "generator":
-            let generatorBagel = new GeneratorBagel(isDisabled);
-            generatorBagel.init(scene, x, y, z);
-            return generatorBagel;
+        case "wheat":
+            let wheatBagel = new WheatBagel(isDisabled);
+            wheatBagel.init(scene, x, y, z);
+            return wheatBagel;
         default:
             let defaultBagel = new StandardBagel(isDisabled);
             defaultBagel.init(scene, x, y, z);
