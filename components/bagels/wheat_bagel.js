@@ -1,6 +1,6 @@
 import __bagel__ from "./__bagel__.js";
 import {ActionManager, ExecuteCodeAction, ParticleHelper} from "@babylonjs/core";
-import image from "../../assets/wheat_bagel.png";
+import image from "../../assets/sprites/wheat_bagel.png";
 import {addWheat} from "../../logic/player_logic.js";
 
 const name = "wheat";

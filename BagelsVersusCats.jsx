@@ -9,10 +9,11 @@ import {catLogicCleanup, catLogicTick, initCatLogic} from "./logic/cat_logic.js"
 import {CURRENT_GAME_STATE, GAME_STATES, initStateLogic, setGameState, stateLogicCleanup, stateLogicTick} from "./logic/state_logic.js";
 import {catSpawnerCleanup, catSpawnerTick, initCatSpawner} from "./containers/cat_spawner.js";
 import {initPlayerLogic} from "./logic/player_logic.js";
-import {fullscreen_ui, initUiLogic, uiLogicTick} from "./logic/ui_logic.js";
+import {cleanupUiLogic, fullscreen_ui, initUiLogic, uiLogicTick} from "./logic/ui_logic.js";
 import {useEffect} from "react";
 import {initBuyMenu} from "./containers/buy_menu.js";
 import {TextBlock} from "@babylonjs/gui";
+import {initSoundLogic} from "./logic/sound_logic.js";
 
 //region PROTOTYPES
 Mesh.prototype.showLocalAxis = function () {
@@ -54,6 +55,7 @@ export default function BagelsVersusCats() {
         initPlayerLogic(scene);
         initUiLogic(scene);
         initStateLogic(scene);
+        initSoundLogic(scene);
     }
 
     /**
@@ -79,6 +81,7 @@ export default function BagelsVersusCats() {
     useEffect(() => {
         return () => {
             console.log("Cleaning up...");
+            cleanupUiLogic();
             stateLogicCleanup();
             bagelLogicCleanup();
             catLogicCleanup();

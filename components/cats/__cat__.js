@@ -1,8 +1,8 @@
 import {cats, removeCat} from "../../logic/cat_logic.js";
 import {Color3, Color4, Mesh, MeshBuilder, Ray, Sprite, SpriteManager, Tags, Vector3} from "@babylonjs/core";
 import {bagels} from "../../logic/bagel_logic.js";
-import {GAME_STATES, setGameState} from "../../logic/state_logic.js";
-import image from "../../assets/skippy.png";
+import {endGame, GAME_STATES, setGameState} from "../../logic/state_logic.js";
+import image from "../../assets/sprites/skippy.png";
 import {createBox} from "../../utils/debug.js";
 import {AdvancedDynamicTexture, Rectangle} from "@babylonjs/gui";
 import Entity from "../entity.js";
@@ -77,7 +77,7 @@ export default class __cat__ extends Entity{
             let foundBagel = bagels.find((bagel) => bagel.id === hit.pickedMesh.id);
             foundBagel.health -= 0.5;
         } else if (this.mesh.position.z - 1 / 200 < -2) {
-            setGameState(GAME_STATES.GAME_OVER);
+            endGame();
         } else {
             this.move();
         }

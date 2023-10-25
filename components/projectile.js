@@ -1,6 +1,7 @@
 import Entity from "./entity.js";
 import {Ray, Vector3} from "@babylonjs/core";
 import {cats} from "../logic/cat_logic.js";
+import {playSound} from "../logic/sound_logic.js";
 
 const name = "Projectile";
 
@@ -35,6 +36,7 @@ export default class Projectile extends Entity {
         if (hit.pickedMesh && hit.pickedMesh.matchesTagsQuery !== undefined && hit.pickedMesh.matchesTagsQuery("cat")) {
             let foundCat = cats.find((cat) => cat.id === hit.pickedMesh.id);
             if(foundCat === undefined) return;
+            playSound("bagelSplat");
             foundCat.health -= this.damage;
             this.cleanup();
         } else if (this.mesh.position.z + 0.01 > 8) {

@@ -1,9 +1,9 @@
 import {Rectangle, TextBlock} from "@babylonjs/gui";
 import {createBox, randomIntFromInterval} from "../utils/debug.js";
 import {ActionManager, Color3, ExecuteCodeAction, KeyboardEventTypes, Vector3} from "@babylonjs/core";
-import {addWheat, PLAYER_WHEAT} from "./player_logic.js";
-import {addToUi, fullscreen_ui} from "./ui_logic.js";
-import {Inspector} from "@babylonjs/inspector";
+import {addWheat} from "./player_logic.js";
+import {addControlToUi, addTextToUi, fullscreen_ui} from "./ui_logic.js";
+import {startBackgroundMusic, stopBackgroundMusic} from "./sound_logic.js";
 
 // Used for react component cleanup, not related to the game //
 let localIntervals = [];
@@ -31,8 +31,19 @@ export const setGameState = (newGameState) => {
     CURRENT_GAME_STATE = newGameState;
 }
 
+export const endGame = () => {
+    CURRENT_GAME_STATE = GAME_STATES.GAME_OVER;
+
+    stopBackgroundMusic();
+
+    addTextToUi("GameOver", "GAME OVER", "#1A202C", 32, "JetBrains Mono");
+}
+
 export const pauseGame = () => {
     CURRENT_GAME_STATE = GAME_STATES.PAUSED;
+
+    stopBackgroundMusic();
+
     let gamePaused = new TextBlock();
     gamePaused.name = "GamePaused";
     gamePaused.text = "GAME PAUSED";
@@ -44,6 +55,9 @@ export const pauseGame = () => {
 
 export const unpauseGame = () => {
     CURRENT_GAME_STATE = GAME_STATES.IN_GAME;
+
+    startBackgroundMusic();
+
     fullscreen_ui.getControlByName("GamePaused").dispose();
 }
 
@@ -106,12 +120,12 @@ export const initStateLogic = (scene) => {
     waveProgress.background = "red";
     waveProgress.thickness = 1;
     waveProgress.top = "50%";
-    addToUi(waveProgress);
+    addControlToUi(waveProgress);
 
     scene.onKeyboardObservable.add((kbInfo) => {
         switch (kbInfo.type) {
             case KeyboardEventTypes.KEYDOWN:
-                if(kbInfo.event.code === "Space") {
+                if (kbInfo.event.code === "Space") {
                     if (CURRENT_GAME_STATE === GAME_STATES.IN_GAME) {
                         pauseGame();
                         console.log("Pausing Game...");
@@ -126,25 +140,6 @@ export const initStateLogic = (scene) => {
 }
 
 export const stateLogicTick = (scene) => {
-    if (CURRENT_GAME_STATE === GAME_STATES.GAME_OVER) {
-        let gameOver = new TextBlock();
-        gameOver.name = "GameOver";
-        gameOver.text = "GAME OVER";
-        gameOver.color = "#1A202C";
-        gameOver.fontFamily = "JetBrains Mono";
-        gameOver.fontSize = 32;
-        fullscreen_ui.addControl(gameOver);
-    } else if (CURRENT_GAME_STATE === GAME_STATES.IN_GAME) {
-        // if (!HAS_WHEAT_DROP_STARTED) {
-        //     let wheatDropId = startWheatDrops(scene);
-        //     localIntervals.push(wheatDropId);
-        //     HAS_WHEAT_DROP_STARTED = true;
-        // }
-
-        // Update Wave Progress //
-        // ticker++;
-        // fullscreen_ui.getControlByName("WaveProgress").width = (ticker / 10000);
-    }
 }
 
 export const stateLogicCleanup = () => {

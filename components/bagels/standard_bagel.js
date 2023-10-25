@@ -1,9 +1,9 @@
 import __bagel__ from "./__bagel__.js";
 import {Color3, Ray, Vector3} from "@babylonjs/core";
 import {createBox} from "../../utils/debug.js";
-import image from "../../assets/bagelv3.png";
+import image from "../../assets/sprites/bagelv3.png";
 import {cats} from "../../logic/cat_logic.js";
-import bagelShotImage from "../../assets/bagel_shot.png";
+import bagelShotImage from "../../assets/sprites/bagel_shot.png";
 import Projectile from "../projectile.js";
 
 const name = "standard_bagel";

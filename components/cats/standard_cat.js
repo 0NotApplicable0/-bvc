@@ -1,5 +1,5 @@
 import {randomIntFromInterval} from "../../utils/debug.js";
-import skippySpriteSheet from "../../assets/skippy_spritesheet3.png";
+import skippySpriteSheet from "../../assets/sprites/skippy_spritesheet3.png";
 import __cat__ from "./__cat__.js";
 
 const name = "standard_cat";
