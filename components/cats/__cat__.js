@@ -25,7 +25,7 @@ export default class __cat__ extends Entity{
     init(scene, x, y, z, spriteManagerOptions) {
         super.init(scene, x, y, z, spriteManagerOptions);
 
-        this.toggleDebugEdges();
+        // this.toggleDebugEdges();
 
         // Create Health Bar
         // Create __cat__ Health Bar Mesh //

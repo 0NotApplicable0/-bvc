@@ -92,7 +92,7 @@ let debug_char = null;
 //region Lifecycle
 export const initDebugUtilities = (scene) => {
     gizmoManager = new GizmoManager(scene);
-    debug_char = createBox(scene, 100, 0, 2, new Color3(0, 1, 0));
+    // debug_char = createBox(scene, 100, 0, 2, new Color3(0, 1, 0));
 
     //region Display debug_char position
     // let debugCharPos = new TextBlock();

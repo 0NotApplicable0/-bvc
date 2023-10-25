@@ -46,33 +46,33 @@ export const removeBagel = (bagel) => {
 export const initBagelLogic = (scene) => {
     bagels = [];
 
-    let test_standard_bagel1 = new StandardBagel();
-    test_standard_bagel1.init(scene, -2, -2, 2);
-    bagels.push(test_standard_bagel1);
-
-    let test_standard_bagel2 = new StandardBagel();
-    test_standard_bagel2.init(scene, -1, -2, 2);
-    bagels.push(test_standard_bagel2);
-
-    let test_standard_bagel3 = new StandardBagel();
-    test_standard_bagel3.init(scene, 0, -2, 2);
-    bagels.push(test_standard_bagel3);
-
-    let test_standard_bagel4 = new StandardBagel();
-    test_standard_bagel4.init(scene, 1, -2, 2);
-    bagels.push(test_standard_bagel4);
-
-    let test_standard_bagel5 = new StandardBagel();
-    test_standard_bagel5.init(scene, 2, -2, 2);
-    bagels.push(test_standard_bagel5);
-
-    let test_standard_bagel6 = new StandardBagel();
-    test_standard_bagel6.init(scene, 3, -2, 2);
-    bagels.push(test_standard_bagel6);
-
-    let test_standard_bagel7 = new StandardBagel();
-    test_standard_bagel7.init(scene, 4, -2, 2);
-    bagels.push(test_standard_bagel7);
+    // let test_standard_bagel1 = new StandardBagel();
+    // test_standard_bagel1.init(scene, -2, -2, 2);
+    // bagels.push(test_standard_bagel1);
+    //
+    // let test_standard_bagel2 = new StandardBagel();
+    // test_standard_bagel2.init(scene, -1, -2, 2);
+    // bagels.push(test_standard_bagel2);
+    //
+    // let test_standard_bagel3 = new StandardBagel();
+    // test_standard_bagel3.init(scene, 0, -2, 2);
+    // bagels.push(test_standard_bagel3);
+    //
+    // let test_standard_bagel4 = new StandardBagel();
+    // test_standard_bagel4.init(scene, 1, -2, 2);
+    // bagels.push(test_standard_bagel4);
+    //
+    // let test_standard_bagel5 = new StandardBagel();
+    // test_standard_bagel5.init(scene, 2, -2, 2);
+    // bagels.push(test_standard_bagel5);
+    //
+    // let test_standard_bagel6 = new StandardBagel();
+    // test_standard_bagel6.init(scene, 3, -2, 2);
+    // bagels.push(test_standard_bagel6);
+    //
+    // let test_standard_bagel7 = new StandardBagel();
+    // test_standard_bagel7.init(scene, 4, -2, 2);
+    // bagels.push(test_standard_bagel7);
 }
 
 export const bagelLogicTick = (scene) => {

@@ -22,10 +22,10 @@ export const cameraSetup = (scene, canvas) => {
     camera.orthoLeft = (-1.2 * width) / 2;
     camera.orthoRight = -camera.orthoLeft;
 
-    scene.onPointerObservable.add(({event}) => {
-        const delta = -Math.sign(event.deltaY);
-        zoom2DView(camera, delta, canvas);
-    }, PointerEventTypes.POINTERWHEEL);
+    // scene.onPointerObservable.add(({event}) => {
+    //     const delta = -Math.sign(event.deltaY);
+    //     zoom2DView(camera, delta, canvas);
+    // }, PointerEventTypes.POINTERWHEEL);
 
     setTopBottomRatio(camera, canvas);
     return camera;

@@ -17,7 +17,7 @@ export default class __bagel__ extends Entity {
 
         this.sprite.width = 0.7;
         this.sprite.height = 0.7;
-        this.toggleDebugEdges();
+        // this.toggleDebugEdges();
 
         if (!this.isDisabled) {
             // Create Health Bar //
