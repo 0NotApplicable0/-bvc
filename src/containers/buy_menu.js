@@ -1,9 +1,22 @@
 import {ActionManager, Color3, ExecuteCodeAction, Mesh, MeshBuilder, PointerEventTypes, Vector3} from "@babylonjs/core";
 import {ground} from "../BagelsVersusCats.jsx";
 import {GridMaterial} from "@babylonjs/materials";
-import {AdvancedDynamicTexture, TextBlock} from "@babylonjs/gui";
+import {AdvancedDynamicTexture, Rectangle, TextBlock} from "@babylonjs/gui";
 import {addBagel, availableBagels, createBagel} from "../logic/bagel_logic.js";
 import {PLAYER_WHEAT, removeWheat} from "../logic/player_logic.js";
+import {maxPlayableX, maxPlayableY, minPlayableY, nonPlayableAreaExtension} from "../utils/debug";
+
+export const highlightPlacementOptions = () => {
+    ground.forEach((platform) => {
+        platform.material.diffuseColor = new Color3(1, 0.5, 0.5);
+    });
+}
+
+export const unhighlightPlacementOptions = () => {
+    ground.forEach((platform) => {
+        platform.material.diffuseColor = new Color3(1, 1, 1);
+    });
+}
 
 export const initBuyMenu = (scene, camera, canvas) => {
     let selectedMesh = null;
@@ -14,21 +27,6 @@ export const initBuyMenu = (scene, camera, canvas) => {
     material.majorUnitFrequency = 0.5;
 
     //region Functions
-    const highlightPlacementOptions = () => {
-        ground.forEach((platform) => {
-            platform.material.previousLineColor = platform.material.lineColor;
-            platform.material.lineColor = new Color3(0, 0, 1);
-        });
-    }
-
-    const unhighlightPlacementOptions = () => {
-        console.log("Unhighlighting: ", ground);
-
-        ground.forEach((platform) => {
-            platform.material.lineColor = platform.material.previousLineColor;
-        });
-    }
-
     const selectBuyOption = (pointerInfo) => {
         if (selectedMesh !== null && pointerInfo.pickInfo.hit && ground.includes(pointerInfo.pickInfo.pickedMesh)) {
             let newBagelPlacement = ground.find((platform) => platform === pointerInfo.pickInfo.pickedMesh).position;
@@ -125,14 +123,32 @@ export const initBuyMenu = (scene, camera, canvas) => {
 
         const generatedMeshes = [];
         availableBagels.forEach((bagel, index) => {
-            generatedMeshes.push(createInScene(5 + (index), -5 + (index), 3, bagel));
+            generatedMeshes.push(createInScene((maxPlayableX + 4) + (index), minPlayableY + (index), 3, bagel));
         });
 
         return generatedMeshes;
     }
     //endregion
 
-    createBuyOptions();
+    // Buy Menu Options //
+    let generatedOptions = createBuyOptions();
+
+    // Buy Menu Background //
+    let guiPlane = MeshBuilder.CreatePlane("buy_plane", {width: 4, height: 10}, scene);
+    guiPlane.parent = generatedOptions[0].mesh;
+    guiPlane.position.y = -1;
+    guiPlane.billboardMode = Mesh.BILLBOARDMODE_ALL;
+
+    let gui = AdvancedDynamicTexture.CreateForMesh(guiPlane, 50, 400);
+    let background = new Rectangle();
+    background.color = "lightgreen";
+    background.background = "lightgreen";
+    background.thickness = 1;
+    background.cornerRadius = 5;
+    background.top = "120";
+    gui.addControl(background);
+
+    // Buy Menu Interaction //
     scene.onPointerObservable.add((pointerInfo) => {
         switch (pointerInfo.type) {
             case PointerEventTypes.POINTERDOWN:

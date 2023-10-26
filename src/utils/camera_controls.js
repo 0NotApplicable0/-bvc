@@ -1,4 +1,5 @@
 import {ArcRotateCamera, Camera, PointerEventTypes, Vector3} from "@babylonjs/core";
+import {maxPlayableX, maxPlayableY, maxX, maxY} from "./debug";
 
 export const cameraSetup = (scene, canvas) => {
     let camera = new ArcRotateCamera(
@@ -6,7 +7,7 @@ export const cameraSetup = (scene, canvas) => {
         Math.PI / 4,
         Math.PI / 4,
         3 * 10,
-        new Vector3(-1, -1.5, 0),
+        new Vector3(maxPlayableX / 2, 0, maxPlayableY / 2 - 2),
         scene
     );
     camera.mode = Camera.ORTHOGRAPHIC_CAMERA;
@@ -22,10 +23,10 @@ export const cameraSetup = (scene, canvas) => {
     camera.orthoLeft = (-1.2 * width) / 2;
     camera.orthoRight = -camera.orthoLeft;
 
-    // scene.onPointerObservable.add(({event}) => {
-    //     const delta = -Math.sign(event.deltaY);
-    //     zoom2DView(camera, delta, canvas);
-    // }, PointerEventTypes.POINTERWHEEL);
+    scene.onPointerObservable.add(({event}) => {
+        const delta = -Math.sign(event.deltaY);
+        zoom2DView(camera, delta, canvas);
+    }, PointerEventTypes.POINTERWHEEL);
 
     setTopBottomRatio(camera, canvas);
     return camera;

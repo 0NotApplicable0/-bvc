@@ -1,6 +1,6 @@
 import {Color4, Mesh} from "@babylonjs/core";
 import {cameraSetup} from "./utils/camera_controls.js";
-import {createPlatform, debugUtilitiesTick, initDebugUtilities} from "./utils/debug.js";
+import {createExperimentalPlatform, createPlatform, debugUtilitiesTick, initDebugUtilities} from "./utils/debug.js";
 import "./styles.css";
 import {Debug} from "@babylonjs/core/Legacy/legacy.js";
 import {SceneManager} from "./containers/SceneManager.jsx";
@@ -11,9 +11,10 @@ import {catSpawnerCleanup, catSpawnerTick, initCatSpawner} from "./containers/ca
 import {initPlayerLogic} from "./logic/player_logic.js";
 import {cleanupUiLogic, fullscreen_ui, initUiLogic, uiLogicTick} from "./logic/ui_logic.js";
 import {useEffect} from "react";
-import {initBuyMenu} from "./containers/buy_menu.js";
+import {initBuyMenu, unhighlightPlacementOptions} from "./containers/buy_menu.js";
 import {TextBlock} from "@babylonjs/gui";
 import {initSoundLogic} from "./logic/sound_logic.js";
+import {highlightPlacementOptions} from "./containers/buy_menu";
 
 //region PROTOTYPES
 Mesh.prototype.showLocalAxis = function () {
@@ -30,7 +31,7 @@ Mesh.prototype.hideLocalAxis = function () {
 
 //region STATE
 export let board = [];
-export let ground = null;
+export let ground = [];
 //endregion
 
 export default function BagelsVersusCats() {
@@ -44,13 +45,16 @@ export default function BagelsVersusCats() {
         scene.clearColor = new Color4(1, 1, 1, 1);
         const canvas = scene.getEngine().getRenderingCanvas();
         const camera = cameraSetup(scene, canvas);
-        ground = createPlatform(scene);
+        // ground = createPlatform(scene);
+        ground = createExperimentalPlatform(scene);
+        highlightPlacementOptions();
+        unhighlightPlacementOptions();
 
         // COMPONENT SETUP //
         initBagelLogic(scene);
         initCatLogic(scene);
         initBuyMenu(scene, camera, canvas);
-        initCatSpawner(scene);
+        // initCatSpawner(scene);
         initDebugUtilities(scene);
         initPlayerLogic(scene);
         initUiLogic(scene);
@@ -70,7 +74,7 @@ export default function BagelsVersusCats() {
             debugUtilitiesTick(scene);
             bagelLogicTick(scene);
             catLogicTick(scene);
-            catSpawnerTick(scene);
+            // catSpawnerTick(scene);
             uiLogicTick(scene);
         }
     }

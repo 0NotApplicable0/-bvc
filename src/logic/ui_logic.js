@@ -36,7 +36,7 @@ export const initUiLogic = (scene) => {
     wheatCounter.name = "WheatCounter";
     wheatCounter.text = "Current Wheat: " + PLAYER_WHEAT;
     wheatCounter.color = "#1A202C";
-    wheatCounter.fontFamily = "JetBrains Mono";
+    wheatCounter.fontFamily = "Arcade";
     wheatCounter.top = "-350px";
     wheatCounter.left = "-600px";
     wheatCounter.fontSize = 24;

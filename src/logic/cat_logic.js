@@ -1,5 +1,5 @@
 import {Color3} from "@babylonjs/core";
-import StandardCat from "../components/cats/standard_cat.js";
+import StandardCat from "../components/cats/SKIPPY.js";
 
 const availableCats = [{
     name: "standard",

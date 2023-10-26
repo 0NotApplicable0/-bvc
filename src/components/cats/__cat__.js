@@ -3,7 +3,7 @@ import {Color3, Color4, Mesh, MeshBuilder, Ray, Sprite, SpriteManager, Tags, Vec
 import {bagels} from "../../logic/bagel_logic.js";
 import {endGame, GAME_STATES, setGameState} from "../../logic/state_logic.js";
 import image from "../../assets/sprites/skippy.png";
-import {createBox} from "../../utils/debug.js";
+import {createBox, minPlayableY} from "../../utils/debug.js";
 import {AdvancedDynamicTexture, Rectangle} from "@babylonjs/gui";
 import Entity from "../entity.js";
 
@@ -76,7 +76,7 @@ export default class __cat__ extends Entity{
         if (hit.pickedMesh && hit.pickedMesh.matchesTagsQuery !== undefined && hit.pickedMesh.matchesTagsQuery("bagel")) {
             let foundBagel = bagels.find((bagel) => bagel.id === hit.pickedMesh.id);
             foundBagel.health -= 0.5;
-        } else if (this.mesh.position.z - 1 / 200 < -2) {
+        } else if (this.mesh.position.z - 1 / 200 < minPlayableY) {
             endGame();
         } else {
             this.move();

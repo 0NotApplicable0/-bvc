@@ -5,6 +5,11 @@ html, body, #root {
     overflow: hidden;
 }
 
+@font-face {
+    font-family: 'Arcade';
+    src: local('Arcade'), url('./assets/ARCADE.TTF') format('truetype');
+}
+
 #scene-explorer-host {
     position: absolute !important;
 }

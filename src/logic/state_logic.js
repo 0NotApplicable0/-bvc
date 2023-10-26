@@ -1,4 +1,4 @@
-import {Rectangle, TextBlock} from "@babylonjs/gui";
+import {Control, Rectangle, StackPanel, TextBlock} from "@babylonjs/gui";
 import {createBox, randomIntFromInterval} from "../utils/debug.js";
 import {ActionManager, Color3, ExecuteCodeAction, KeyboardEventTypes, Vector3} from "@babylonjs/core";
 import {addWheat} from "./player_logic.js";
@@ -122,6 +122,23 @@ export const initStateLogic = (scene) => {
     waveProgress.top = "50%";
     addControlToUi(waveProgress);
 
+    // Pause Menu UI //
+    const pauseMenu = new Rectangle();
+    pauseMenu.horizontalAlignment = Control.HORIZONTAL_ALIGNMENT_CENTER;
+    pauseMenu.verticalAlignment = Control.VERTICAL_ALIGNMENT_CENTER;
+    pauseMenu.height = 0.8;
+    pauseMenu.width = 0.5;
+    pauseMenu.thickness = 0;
+    pauseMenu.isVisible = true;
+
+    // const image = new Image("pause", "sprites/pause.jpeg");
+    // pauseMenu.addControl(image);
+
+    const stackPanel = new StackPanel();
+    stackPanel.width = .83;
+    pauseMenu.addControl(stackPanel);
+
+    // DEBUG //
     scene.onKeyboardObservable.add((kbInfo) => {
         switch (kbInfo.type) {
             case KeyboardEventTypes.KEYDOWN:

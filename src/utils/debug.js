@@ -1,4 +1,4 @@
-import {ActionManager, Color3, ExecuteCodeAction, GizmoManager, KeyboardEventTypes, MeshBuilder, SceneLoader, Texture, Vector3} from "@babylonjs/core";
+import {Color3, DynamicTexture, GizmoManager, HemisphericLight, KeyboardEventTypes, MeshBuilder, SceneLoader, StandardMaterial, Texture, Vector3} from "@babylonjs/core";
 import {GridMaterial} from "@babylonjs/materials";
 import {Inspector} from "@babylonjs/inspector";
 import '@babylonjs/loaders';
@@ -6,9 +6,23 @@ import '@babylonjs/loaders';
 import bagelStallTexture from "../assets/textures/stall_baseColor.png";
 import bagelGroundTexture from "../assets/textures/gound_baseColor.png";
 import bagelStand from "../assets/background.glb";
-import {addWheat} from "../logic/player_logic.js";
 // import bagelStand from "../assets/scene.gltf";
 // import bagelStand from "../assets/bread_stall.fbx";
+import grassTile from "../assets/textures/tile.png";
+import {ground} from "../BagelsVersusCats";
+
+export const nonPlayableAreaExtension = 10;
+
+export const minPlayableX = 0;
+export const minPlayableY = 0;
+export const maxPlayableX = 6;
+export const maxPlayableY = 12;
+
+export const maxX = maxPlayableX + nonPlayableAreaExtension;
+export const maxY = maxPlayableY + nonPlayableAreaExtension;
+
+export const minX = minPlayableX - nonPlayableAreaExtension;
+export const minY = minPlayableY - nonPlayableAreaExtension;
 
 //region Helper functions
 export const createBox = (scene, x, y, z, color, name, opacity) => {
@@ -77,9 +91,48 @@ export const createPlatform = (scene) => {
         }
     );
 
-    scene.createDefaultEnvironment({createGround:false, createSkybox:false})
+    scene.createDefaultEnvironment({createGround: false, createSkybox: false})
 
     return ground;
+}
+
+export const createExperimentalPlatform = (scene) => {
+    const light = new HemisphericLight("HemiLight", new Vector3(0, 1, 0), scene);
+    const playableGround = [];
+
+    for (let x = minX; x <= maxX; x++) {
+        for (let y = minY; y <= maxY; y++) {
+            for (let z = 0; z < 1; z++) {
+                let box = MeshBuilder.CreateBox("box", {size: 1}, scene);
+                box.position.x = x;
+                box.position.z = y;
+                box.position.y = z;
+
+                const grassTexture = new Texture(grassTile, scene);
+                const groundMat = new StandardMaterial("groundMat");
+                groundMat.diffuseTexture = grassTexture;
+
+                // DEBUG, Render coordinates on each tile //
+                // var textureResolution = 512;
+                // var textureGround = new DynamicTexture("dynamic texture", {width: 512, height: 256}, scene);
+                // var textureContext = textureGround.getContext();
+                // var font = "bold 44px monospace";
+                if (x >= minPlayableX && x <= maxPlayableX
+                    && y >= minPlayableY && y <= maxPlayableY) {
+                    playableGround.push(box);
+                    // groundMat.diffuseTexture = teSxtureGround;
+                    // textureGround.drawText(`X: ${x} - Y: ${y}`, 75, 135, font, "red", "white", true, true);
+                } else {
+                    // groundMat.diffuseTexture = textureGround;
+                    // textureGround.drawText(`X: ${x} - Y: ${y}`, 75, 135, font, "green", "white", true, true);
+                }
+
+                box.material = groundMat;
+            }
+        }
+    }
+
+    return playableGround;
 }
 
 export const randomIntFromInterval = (min, max) => {
